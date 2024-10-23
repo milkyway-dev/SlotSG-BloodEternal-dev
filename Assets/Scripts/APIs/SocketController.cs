@@ -44,7 +44,7 @@ public class SocketController : MonoBehaviour
     private const int maxReconnectionAttempts = 6;
     private readonly TimeSpan reconnectionDelay = TimeSpan.FromSeconds(10);
 
-    internal Action<List<string>> OnInit;
+    internal Action OnInit;
     internal Action ShowDisconnectionPopup;
     private void Awake()
     {
@@ -226,13 +226,8 @@ public class SocketController : MonoBehaviour
 
     private void InitRequest(string eventName)
     {
-        InitData message = new InitData();
-        message.Data = new AuthData();
-        message.Data.GameID = gameID;
-        message.id = "Auth";
-        // Serialize message data to JSON
-        string json = JsonUtility.ToJson(message);
-        SendDataWithNamespace(eventName, json);
+        var initmessage = new { Data = new { GameID = gameID }, id = "Auth" };
+        SendData(eventName, initmessage);
     }
 
     internal void CloseSocket()
@@ -259,8 +254,8 @@ public class SocketController : MonoBehaviour
                     socketModel.initGameData.Bets = gameData["Bets"].ToObject<List<double>>();
                     socketModel.initGameData.lineData = gameData["Lines"].ToObject<List<List<int>>>();
 
-                    Debug.Log(JsonConvert.SerializeObject(socketModel.initGameData.Bets));
-                    // OnInit?.Invoke(LinesString);
+                    Debug.Log(JsonConvert.SerializeObject(socketModel.initGameData.lineData));
+                    OnInit?.Invoke();
                     break;
                 }
             case "ResultData":
@@ -328,6 +323,27 @@ public class SocketController : MonoBehaviour
         {
             Debug.LogWarning("Socket is not connected.");
         }
+    }
+
+
+    internal void SendData(string eventName, object message = null)
+    {
+
+        if (this.manager.Socket == null || !this.manager.Socket.IsOpen)
+        {
+            Debug.LogWarning("Socket is not connected.");
+            return;
+        }
+        if (message == null)
+        {
+            this.manager.Socket.Emit(eventName);
+            return;
+        }
+        isResultdone = false;
+        string json = JsonConvert.SerializeObject(message);
+        this.manager.Socket.Emit(eventName, json);
+        Debug.Log("JSON data sent: " + json);
+
     }
 
     private List<string> RemoveQuotes(List<string> stringList)

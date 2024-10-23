@@ -44,7 +44,7 @@ public class ResultGameData
 public class InitGameData
 {
     public List<List<string>> Reel { get; set; }
-    public List<List<int>> Lines { get; set; }
+    // public List<List<int>> Lines { get; set; }
     public List<double> Bets { get; set; }
     public bool canSwitchLines { get; set; }
     public List<int> LinesCount { get; set; }

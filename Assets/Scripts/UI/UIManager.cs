@@ -61,7 +61,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Scripts")]
     [SerializeField] private AudioController audioController;
-    [SerializeField] private SlotBehaviour slotManager;
+    [SerializeField] private SlotController slotManager;
     [SerializeField] private SocketController socketManager;
 
     [Header("disconnection popup")]
