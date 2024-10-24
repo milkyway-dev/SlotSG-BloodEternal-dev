@@ -19,8 +19,11 @@ public class SlotController : MonoBehaviour
     [Header("Slot Images")]
     [SerializeField]
     private List<SlotImage> images;
-    [SerializeField]
-    private List<SlotImage> slotMatrix;
+    [SerializeField] private List<SlotImage> slotMatrix;
+    [SerializeField] private GlowMatrix[] glowMatrix;
+
+    [SerializeField] internal GameObject disableIconsPanel;
+
 
     [Header("Slots Transforms")]
     [SerializeField] private Transform[] Slot_Transform;
@@ -63,7 +66,9 @@ public class SlotController : MonoBehaviour
     [SerializeField]
     private AudioClip[] _winSounds;
 
-    int tweenHeight = 0;  //calculate the height at which tweening is done
+    [Header("tween properties")]
+    [SerializeField] private int tweenHeight = 0;
+    [SerializeField] private float initialPos;
 
     [SerializeField]
     private GameObject Image_Prefab;    //icons prefab
@@ -109,9 +114,10 @@ public class SlotController : MonoBehaviour
 
     [SerializeField] private ImageAnimation[] reel_border;
 
-    [SerializeField] private GlowMatrix[] glowMatrix;
     // [SerializeField] private ImageAnimation[] slotGlowRed;
     // [SerializeField] private ImageAnimation[] slotGlowBlue;
+    internal List<IconController> animatedIcons= new List<IconController>();
+
     private void Start()
     {
 
@@ -135,7 +141,7 @@ public class SlotController : MonoBehaviour
 
         // if (MaxBet_Button) MaxBet_Button.onClick.RemoveAllListeners();
         // if (MaxBet_Button) MaxBet_Button.onClick.AddListener(MaxBet);
-        tweenHeight = (16 * IconSizeFactor) - 280;
+        // tweenHeight = (16 * IconSizeFactor) - 280;
     }
 
     private void AutoSpin()
@@ -481,7 +487,7 @@ public class SlotController : MonoBehaviour
             List<int> resultnum = SocketManager.resultData.FinalResultReel[j]?.Split(',')?.Select(Int32.Parse)?.ToList();
             for (int i = 0; i < 5; i++)
             {
-                if (images[i].slotImages[images[i].slotImages.Count - 5 + j]) images[i].slotImages[images[i].slotImages.Count - 5 + j].sprite = myImages[resultnum[i]];
+                // if (images[i].slotImages[images[i].slotImages.Count - 5 + j]) images[i].slotImages[images[i].slotImages.Count - 5 + j].sprite = myImages[resultnum[i]];
                 // PopulateAnimationSprites(images[i].slotImages[images[i].slotImages.Count - 5 + j].gameObject.GetComponent<ImageAnimation>(), resultnum[i]);
             }
         }
@@ -546,7 +552,7 @@ public class SlotController : MonoBehaviour
 
     }
 
-    internal IEnumerator StopSpin(float delay1 = 0, float delay2 = 0, List<int[]> vHPos=null)
+    internal IEnumerator StopSpin(float delay1 = 0, float delay2 = 0, List<int[]> vHPos = null)
     {
 
         for (int i = 0; i < Slot_Transform.Length; i++)
@@ -614,7 +620,7 @@ public class SlotController : MonoBehaviour
             for (int j = 0; j < 3; j++)
             {
                 int randomIndex = UnityEngine.Random.Range(0, myImages.Length);
-                slotMatrix[i].slotImages[j].sprite = myImages[randomIndex];
+                slotMatrix[i].slotImages[j].iconImage.sprite = myImages[randomIndex];
             }
         }
     }
@@ -653,25 +659,39 @@ public class SlotController : MonoBehaviour
     }
 
     //start the icons animation
-    private void StartGameAnimation(GameObject animObjects)
+    internal void disableAllIcons()
     {
-        int i = animObjects.transform.childCount;
+        disableIconsPanel.SetActive(true);
 
-        if (i > 0)
-        {
-            ImageAnimation temp = animObjects.GetComponent<ImageAnimation>();
-            animObjects.transform.GetChild(0).gameObject.SetActive(true);
-
-            temp.StartAnimation();
-
-            TempList.Add(temp);
-        }
-        else
-        {
-            animObjects.GetComponent<ImageAnimation>().StartAnimation();
-
-        }
     }
+
+    internal void StartIconAnimation(List<string> iconPos)
+    {
+        for (int j = 0; j < iconPos.Count; j++)
+        {
+            int[] pos = iconPos[j].Split(',').Select(int.Parse).ToArray();
+            IconController tempIcon=slotMatrix[pos[0]].slotImages[pos[1]];
+            tempIcon.frontBorder.SetActive(true);
+            tempIcon.transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0), 0.3f, 0, 0.3f);
+            tempIcon.transform.SetParent(disableIconsPanel.transform);
+            animatedIcons.Add(tempIcon);
+
+        }
+        // getAnimatedIcons?.Invoke(animatedIcons);
+
+    }
+
+    internal void StopIconAnimation(){
+
+        foreach (var item in animatedIcons)
+        {
+            item.frontBorder.SetActive(false);
+            item.transform.localScale=Vector3.one;
+            item.transform.SetParent(item.parent);
+        }
+        animatedIcons.Clear();
+    }
+
 
     void ActivateReelBorder(string type)
     {
@@ -692,7 +712,6 @@ public class SlotController : MonoBehaviour
 
     internal void DeActivateReelBorder()
     {
-
         for (int i = 0; i < reel_border.Length; i++)
         {
             reel_border[i].gameObject.SetActive(false);
@@ -706,7 +725,7 @@ public class SlotController : MonoBehaviour
 
         VHObjectsBlue[index].gameObject.SetActive(true);
         VHObjectsBlue[index].StartAnimation();
-        VHObjectsBlue[index].transform.DOPunchScale(new Vector3(0.4f, 0.4f, 0), 0.3f, 0, 1.2f); ;
+        VHObjectsBlue[index].transform.DOPunchScale(new Vector3(0.4f, 0.4f, 0), 0.3f, 0, 1.2f);
     }
 
     internal void IconShakeAnim(int[] icon1, int[] icon2)
@@ -718,10 +737,10 @@ public class SlotController : MonoBehaviour
 
     void EnableIconGlow(int[] pos)
     {
-            glowMatrix[pos[0]].row[pos[1]].gameObject.SetActive(true);
-            glowMatrix[pos[0]].row[pos[1]].StartAnimation();
+        glowMatrix[pos[0]].row[pos[1]].gameObject.SetActive(true);
+        glowMatrix[pos[0]].row[pos[1]].StartAnimation();
 
-        
+
     }
 
     internal void DisableGlow()
@@ -730,8 +749,8 @@ public class SlotController : MonoBehaviour
         {
             for (int j = 0; j < glowMatrix[i].row.Count; j++)
             {
-            glowMatrix[i].row[j].gameObject.SetActive(false);
-            glowMatrix[i].row[j].StopAnimation();
+                glowMatrix[i].row[j].gameObject.SetActive(false);
+                glowMatrix[i].row[j].StopAnimation();
             }
 
         }
@@ -773,11 +792,11 @@ public class SlotController : MonoBehaviour
                 {
                     if (points_anim[k] >= 10)
                     {
-                        StartGameAnimation(slotMatrix[(points_anim[k] / 10) % 10].slotImages[points_anim[k] % 10].gameObject);
+                        // StartGameAnimation(slotMatrix[(points_anim[k] / 10) % 10].slotImages[points_anim[k] % 10].gameObject);
                     }
                     else
                     {
-                        StartGameAnimation(slotMatrix[0].slotImages[points_anim[k]].gameObject);
+                        // StartGameAnimation(slotMatrix[0].slotImages[points_anim[k]].gameObject);
                     }
                 }
             }
@@ -794,12 +813,12 @@ public class SlotController : MonoBehaviour
     {
         // slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
         Tweener tweener = null;
-        tweener = slotTransform.DOLocalMoveY(-tweenHeight, 0.45f).SetEase(Ease.InBack).OnComplete(() =>
+        tweener = slotTransform.DOLocalMoveY(-tweenHeight + 350, 0.35f).SetEase(Ease.InBack).OnComplete(() =>
         {
             tweener.Pause();
             slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, -835f);
             tweener.Kill();
-            tweener = slotTransform.DOLocalMoveY(-tweenHeight, 0.25f).SetLoops(-1, LoopType.Restart).SetDelay(0);
+            tweener = slotTransform.DOLocalMoveY(-tweenHeight + 350, 0.2f).SetLoops(-1, LoopType.Restart).SetDelay(0);
             alltweens.Add(tweener);
 
         });
@@ -811,9 +830,8 @@ public class SlotController : MonoBehaviour
     private void StopTweening(Transform slotTransform, int index)
     {
         alltweens[index].Pause();
-        slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, -330);
-        int tweenpos = -835;
-        alltweens[index] = slotTransform.DOLocalMoveY(tweenpos, 0.25f).SetEase(Ease.OutQuad); // slot initial pos - iconsizefactor - spacing
+        slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, initialPos + 500);
+        alltweens[index] = slotTransform.DOLocalMoveY(initialPos, 0.25f).SetEase(Ease.OutQuad); // slot initial pos - iconsizefactor - spacing
 
     }
 
@@ -834,7 +852,7 @@ public class SlotController : MonoBehaviour
 [Serializable]
 public class SlotImage
 {
-    public List<Image> slotImages = new List<Image>(10);
+    public List<IconController> slotImages = new List<IconController>(10);
 }
 
 [Serializable]

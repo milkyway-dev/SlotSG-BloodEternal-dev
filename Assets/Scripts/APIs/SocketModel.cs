@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using JetBrains.Annotations;
 
-public class SocketModel : MonoBehaviour
+public class SocketModel 
 {
 
     public PlayerData playerData;

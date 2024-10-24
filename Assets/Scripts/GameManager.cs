@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour
     private Coroutine autoSpinRoutine;
 
     [SerializeField] private int wildPosition;
+    [SerializeField] private bool stopIconAnim;
 
     void Awake()
     {
@@ -133,11 +134,6 @@ public class GameManager : MonoBehaviour
         {
             // var spinData = new { data = new { currentBet = betCounter, currentLines = 30, spins = 1 }, id = "SPIN" };
             // socketController.SendData("message", spinData);
-            if (isFreeSpin && !freeSpinStarted)
-            {
-                freeSpinStarted = true;
-                yield return InitiateFreeSpin();
-            }
             yield return OnSpin();
         }
         yield return OnSpinEnd();
@@ -164,21 +160,59 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
         List<int[]> vHPos = new List<int[]>
             {
-                new int[] { 1, 0 },
-                new int[] { 1, 1 }
+                new int[] { 1, 1 },
+                new int[] { 2, 1 }
             };
-        yield return slotManager.StopSpin(2, 0,vHPos);
+        yield return slotManager.StopSpin(2, 0, vHPos);
 
-        yield return OnSpinEnd();
     }
     IEnumerator OnSpinEnd()
     {
         slotManager.DeActivateReelBorder();
+        List<List<string>> symbolsToEmit = new List<List<string>>
+            {
+                new List<string>(){ "0,2","1,2","2,2" },
+                new List<string>(){ "5,1","4,1","3,1" }
+            };
+        List<string> symbolsToEmitFlattened = new List<string>()
+            {
+                 "0,2","1,2","2,2","5,1","4,1","3,1"
+            };
+
+        slotManager.disableIconsPanel.SetActive(true);
+        slotManager.StartIconAnimation(symbolsToEmitFlattened);
+        yield return new WaitForSeconds(0.8f);
+        slotManager.StopIconAnimation();
+
+
+
+        if (isFreeSpin)
+        {
+            yield return InitiateFreeSpin();
+        }
         if (!isAutoSpin && !isFreeSpin)
         {
             slotManager.DisableGlow();
             isSpinning = false;
             ToggleButtonGrp(true);
+        }
+
+        if (!isAutoSpin && !isFreeSpin)
+        {
+            int j = 5;
+            while (j > 0)
+            {
+                for (int i = 0; i < symbolsToEmit.Count; i++)
+                {
+                    slotManager.StartIconAnimation(symbolsToEmit[i]);
+                    yield return new WaitForSeconds(0.8f);
+                    slotManager.StopIconAnimation();
+                }
+                j--;
+                yield return null;
+            }
+            slotManager.disableIconsPanel.SetActive(false);
+
         }
         yield return null;
     }
