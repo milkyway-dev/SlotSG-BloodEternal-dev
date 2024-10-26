@@ -33,10 +33,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private double currentTotalBet;
     [SerializeField] private int betCounter = 0;
     private Coroutine autoSpinRoutine;
+    private Coroutine iterativeRoutine;
 
     [SerializeField] private int wildPosition;
     [SerializeField] private bool stopIconAnim;
 
+    [SerializeField] private int maxIterationWinShow;
+    [SerializeField] private int winIterationCount;
     void Awake()
     {
 
@@ -142,7 +145,9 @@ public class GameManager : MonoBehaviour
     bool OnSpinStart()
     {
         isSpinning = true;
-
+        winIterationCount=0;
+        slotManager.StopIconAnimation();
+        slotManager.disableIconsPanel.SetActive(false);
         if (currentBalance < currentTotalBet && !isFreeSpin)
         {
             uIManager.LowBalPopup();
@@ -180,10 +185,10 @@ public class GameManager : MonoBehaviour
             };
 
         slotManager.disableIconsPanel.SetActive(true);
-        slotManager.StartIconAnimation(symbolsToEmitFlattened);
-        yield return new WaitForSeconds(0.8f);
-        slotManager.StopIconAnimation();
-
+        slotManager.StartIconBlastAnimation(symbolsToEmitFlattened);
+        yield return new WaitForSeconds(0.6f);
+        slotManager.StopIconBlastAnimation();
+        yield return new WaitForSeconds(0.1f);
 
 
         if (isFreeSpin)
@@ -199,23 +204,32 @@ public class GameManager : MonoBehaviour
 
         if (!isAutoSpin && !isFreeSpin)
         {
-            int j = 5;
-            while (j > 0)
-            {
-                for (int i = 0; i < symbolsToEmit.Count; i++)
-                {
-                    slotManager.StartIconAnimation(symbolsToEmit[i]);
-                    yield return new WaitForSeconds(0.8f);
-                    slotManager.StopIconAnimation();
-                }
-                j--;
-                yield return null;
-            }
-            slotManager.disableIconsPanel.SetActive(false);
+            iterativeRoutine=StartCoroutine(IterativeWinShowRoutine(symbolsToEmit));
 
         }
-        yield return null;
     }
+
+    private IEnumerator IterativeWinShowRoutine(List<List<string>> symbolsToEmit)
+    {
+        winIterationCount = maxIterationWinShow;
+        while (winIterationCount > 0)
+        {
+            for (int i = 0; i < symbolsToEmit.Count; i++)
+            {
+                if(winIterationCount>0){
+                 slotManager.StartIconAnimation(symbolsToEmit[i]);
+                    yield return new WaitForSeconds(0.8f);
+                slotManager.StopIconAnimation();
+                }else{
+                    yield break;
+                }
+            }
+            winIterationCount--;
+            yield return null;
+        }
+        slotManager.disableIconsPanel.SetActive(false);
+    }
+
     IEnumerator InitiateFreeSpin()
     {
         slotManager.IconShakeAnim(new int[] { 1, 1 }, new int[] { 2, 1 });
