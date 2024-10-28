@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class IconController : MonoBehaviour
+public class SlotIconView : MonoBehaviour
 {
     [Header("required fields")]
     [SerializeField] internal Image iconImage;

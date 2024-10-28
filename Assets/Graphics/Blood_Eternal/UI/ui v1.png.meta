@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 90d3df1fedea445ba8643b53ae3bc5ba
+guid: 41b4f87fa624f40cb91cbe1a8fc479aa
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -123,13 +123,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ui_0
+      name: ui v1_13
       rect:
         serializedVersion: 2
         x: 477
-        y: 242
+        y: 244
         width: 1364
-        height: 736
+        height: 734
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -137,20 +137,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a5278f9d673a04b77b96b1af529dac36
-      internalID: -274158238
+      spriteID: 41e1b3fa8a162482784283b59cf57d20
+      internalID: 756429494
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_1
+      name: ui v1_15
       rect:
         serializedVersion: 2
-        x: 1893
-        y: 839
-        width: 93
-        height: 94
+        x: 194
+        y: 666
+        width: 177
+        height: 132
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -158,20 +158,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0517d583ec66941bba64a1beb2442bb2
-      internalID: 539376802
+      spriteID: aabdf633f90324af1accda6a350a7ba9
+      internalID: 1893295755
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_2
+      name: ui v1_16
       rect:
         serializedVersion: 2
-        x: 157
-        y: 676
-        width: 179
-        height: 134
+        x: 168
+        y: 429
+        width: 228
+        height: 170
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -179,40 +179,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3246b519df8ce48adb5ba4ea564df905
-      internalID: -1967959962
+      spriteID: bf1bcf21cfcaf47f4b7f332de01462be
+      internalID: -379494599
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ui_3
+      name: ui v1_17
       rect:
         serializedVersion: 2
-        x: 140
-        y: 413
-        width: 215
-        height: 165
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5968154c40c9440d784f330217f38443
-      internalID: 1607979119
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ui_4
-      rect:
-        serializedVersion: 2
-        x: 549
-        y: 127
-        width: 1187
+        x: 548
+        y: 128
+        width: 1188
         height: 66
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -221,8 +200,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f54904e6ea6a847d29f5e27378e749ca
-      internalID: 416592456
+      spriteID: ce54137b984544c1cb8e76197454c8c7
+      internalID: 560170414
       vertices: []
       indices: 
       edges: []
@@ -238,11 +217,24 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      ui_0: -274158238
-      ui_1: 539376802
-      ui_2: -1967959962
-      ui_3: 1607979119
-      ui_4: 416592456
+      ui v1_0: -1140419092
+      ui v1_1: -1143909142
+      ui v1_10: -1048244646
+      ui v1_11: 714944832
+      ui v1_12: 910191256
+      ui v1_13: 756429494
+      ui v1_14: 820740591
+      ui v1_15: 1893295755
+      ui v1_16: -379494599
+      ui v1_17: 560170414
+      ui v1_2: -1873019161
+      ui v1_3: -1941543132
+      ui v1_4: -286627820
+      ui v1_5: 14741007
+      ui v1_6: 621724928
+      ui v1_7: -2030631762
+      ui v1_8: 1771309680
+      ui v1_9: 1541521968
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private UIManager uIManager;
     [SerializeField] private SocketController socketController;
     [SerializeField] private AudioController audioController;
-    [SerializeField] private PayoutCalculation PayCalculator;
+    [SerializeField] private PaylineController PayCalculator;
 
     [Header("Action Buttons")]
     [SerializeField] private Button SlotStart_Button;
@@ -36,7 +36,6 @@ public class GameManager : MonoBehaviour
     private Coroutine iterativeRoutine;
 
     [SerializeField] private int wildPosition;
-    [SerializeField] private bool stopIconAnim;
 
     [SerializeField] private int maxIterationWinShow;
     [SerializeField] private int winIterationCount;

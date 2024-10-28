@@ -74,7 +74,7 @@ public class SlotController : MonoBehaviour
     private GameObject Image_Prefab;    //icons prefab
 
     [SerializeField]
-    private PayoutCalculation PayCalculator;
+    private PaylineController PayCalculator;
 
     private List<Tweener> alltweens = new List<Tweener>();
 
@@ -116,7 +116,7 @@ public class SlotController : MonoBehaviour
 
     // [SerializeField] private ImageAnimation[] slotGlowRed;
     // [SerializeField] private ImageAnimation[] slotGlowBlue;
-    internal List<IconController> animatedIcons = new List<IconController>();
+    internal List<SlotIconView> animatedIcons = new List<SlotIconView>();
 
     private void Start()
     {
@@ -257,7 +257,6 @@ public class SlotController : MonoBehaviour
                 DeActivateReelBorder();
                 ActivateReelBorder("red");
                 yield return new WaitForSeconds(delay1);
-
             }
 
             if (delay2 > 0 && i == 4)
@@ -269,7 +268,7 @@ public class SlotController : MonoBehaviour
 
             StopTweening(Slot_Transform[i], i);
             yield return new WaitForSeconds(0.25f);
-            if (i > 0 && i < 5)
+            if (i > 0 && i < 5 && vHPos!=null)
             {
 
                 for (int k = 0; k < vHPos.Count; k++)
@@ -320,45 +319,7 @@ public class SlotController : MonoBehaviour
         }
     }
 
-    private void OnApplicationFocus(bool focus)
-    {
-        audioController.CheckFocusFunction(focus, CheckSpinAudio);
-    }
 
-    // [x]
-    void ToggleButtonGrp(bool toggle)
-    {
-
-        if (SlotStart_Button) SlotStart_Button.interactable = toggle;
-        if (AutoSpin_Button) AutoSpin_Button.interactable = toggle;
-        if (Maxbet_button) Maxbet_button.interactable = toggle;
-        if (BetMinus_Button) BetMinus_Button.interactable = toggle;
-        if (BetPlus_Button) BetPlus_Button.interactable = toggle;
-
-    }
-
-    // [x]
-    private void CompareBalance()
-    {
-        if (currentBalance < currentTotalBet)
-        {
-            uiManager.LowBalPopup();
-            if (AutoSpin_Button) AutoSpin_Button.interactable = false;
-            if (SlotStart_Button) SlotStart_Button.interactable = false;
-        }
-        else
-        {
-            if (AutoSpin_Button) AutoSpin_Button.interactable = true;
-            if (SlotStart_Button) SlotStart_Button.interactable = true;
-        }
-    }
-
-    //start the icons animation
-    internal void disableAllIcons()
-    {
-        disableIconsPanel.SetActive(true);
-
-    }
 
     internal void StartIconBlastAnimation(List<string> iconPos)
     {
@@ -366,7 +327,7 @@ public class SlotController : MonoBehaviour
         for (int j = 0; j < iconPos.Count; j++)
         {
             int[] pos = iconPos[j].Split(',').Select(int.Parse).ToArray();
-            IconController tempIcon = slotMatrix[pos[0]].slotImages[pos[1]];
+            SlotIconView tempIcon = slotMatrix[pos[0]].slotImages[pos[1]];
             tempIcon.blastAnim.SetActive(true);
             tempIcon.blastAnim.transform.DOScale(new Vector2(1.1f, 1.1f), 0.35f).SetEase(Ease.OutBack).OnComplete(() =>
             {
@@ -397,7 +358,7 @@ public class SlotController : MonoBehaviour
         for (int j = 0; j < iconPos.Count; j++)
         {
             int[] pos = iconPos[j].Split(',').Select(int.Parse).ToArray();
-            IconController tempIcon = slotMatrix[pos[0]].slotImages[pos[1]];
+            SlotIconView tempIcon = slotMatrix[pos[0]].slotImages[pos[1]];
             tempIcon.frontBorder.SetActive(true);
             tempIcon.transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0), 0.3f, 0, 0.3f);
             tempIcon.transform.SetParent(disableIconsPanel.transform);
@@ -535,7 +496,7 @@ public class SlotController : MonoBehaviour
 [Serializable]
 public class SlotImage
 {
-    public List<IconController> slotImages = new List<IconController>(10);
+    public List<SlotIconView> slotImages = new List<SlotIconView>(10);
 }
 
 [Serializable]
