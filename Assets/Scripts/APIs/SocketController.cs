@@ -11,15 +11,10 @@ using Newtonsoft.Json.Linq;
 public class SocketController : MonoBehaviour
 {
 
-    internal GameData initialData = null;
-    internal UIData initUIData = null;
-    internal GameData resultData = null;
-    internal PlayerData playerdata = null;
 
     internal SocketModel socketModel= new SocketModel();
 
-    [SerializeField]
-    internal List<string> bonusdata = null;
+
     //WebSocket currentSocket = null;
     internal bool isResultdone = false;
 
@@ -31,13 +26,13 @@ public class SocketController : MonoBehaviour
     //private string SocketURI;
 
     protected string SocketURI = null;
-    protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
+    protected string TestSocketURI = "http://localhost:5000";
     //protected string SocketURI = "http://localhost:5000";
 
     [SerializeField]
     private string TestToken;
 
-    protected string gameID = "SL-GF";
+    protected string gameID = "";
 
     internal bool isLoading;
     internal bool SetInit = false;
@@ -240,12 +235,12 @@ public class SocketController : MonoBehaviour
         Debug.Log(jsonObject);
         JObject resp = JObject.Parse(jsonObject);
 
-        Root myData = JsonConvert.DeserializeObject<Root>(jsonObject);
 
         string id = resp["id"].ToString();
         var message = resp["message"];
         var gameData = message["GameData"];
-
+        var playerData= message["PlayerData"];
+        socketModel.playerData=message["PlayerData"].ToObject<PlayerData>();
         switch (id)
         {
             case "InitData":
@@ -254,7 +249,6 @@ public class SocketController : MonoBehaviour
                     socketModel.initGameData.Bets = gameData["Bets"].ToObject<List<double>>();
                     socketModel.initGameData.lineData = gameData["Lines"].ToObject<List<List<int>>>();
 
-                    Debug.Log(JsonConvert.SerializeObject(socketModel.initGameData.lineData));
                     OnInit?.Invoke();
                     break;
                 }
@@ -266,6 +260,7 @@ public class SocketController : MonoBehaviour
                     // myData.message.GameData.FinalsymbolsToEmit = TransformAndRemoveRecurring(myData.message.GameData.symbolsToEmit);
                     // resultData = myData.message.GameData;
                     // playerdata = myData.message.PlayerData;
+
                     isResultdone = true;
                     break;
                 }

@@ -97,6 +97,9 @@ public class UIManager : MonoBehaviour
     private bool isSound = true;
     private bool isExit = false;
 
+    [Header("player texts")]
+    [SerializeField ] private TMP_Text playerCurrentWinning;
+    [SerializeField ] private TMP_Text playerBalance;
 
     private void Awake()
     {
@@ -208,6 +211,11 @@ public class UIManager : MonoBehaviour
         StopCoroutine(LoadingTextAnimate());
     }
 
+    internal void UpdatePlayerInfo(PlayerData playerData){
+     playerCurrentWinning.text=playerData.currentWining.ToString();
+     playerBalance.text=playerData.Balance.ToString();
+
+    }
     private IEnumerator LoadingTextAnimate()
     {
         while (true)

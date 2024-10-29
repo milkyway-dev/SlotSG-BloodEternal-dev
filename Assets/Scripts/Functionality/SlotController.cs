@@ -14,7 +14,7 @@ public class SlotController : MonoBehaviour
 
     [Header("Sprites")]
     [SerializeField]
-    private Sprite[] myImages;
+    private Sprite[] iconImages;
 
     [Header("Slot Images")]
     [SerializeField]
@@ -247,6 +247,16 @@ public class SlotController : MonoBehaviour
 
     }
 
+    internal void PopulateSLotMatrix(List<List<int>> resultData)
+    {
+        for (int j = 0; j < slotMatrix[0].slotImages.Count; j++)
+        {
+            for (int i = 0; i < slotMatrix.Count; i++)
+            {
+                slotMatrix[i].slotImages[j].iconImage.sprite = iconImages[resultData[j][i]];
+            }
+        }
+    }
     internal IEnumerator StopSpin(float delay1 = 0, float delay2 = 0, List<int[]> vHPos = null)
     {
 
@@ -268,7 +278,7 @@ public class SlotController : MonoBehaviour
 
             StopTweening(Slot_Transform[i], i);
             yield return new WaitForSeconds(0.25f);
-            if (i > 0 && i < 5 && vHPos!=null)
+            if (i > 0 && i < 5 && vHPos != null)
             {
 
                 for (int k = 0; k < vHPos.Count; k++)
@@ -289,22 +299,22 @@ public class SlotController : MonoBehaviour
 
     internal void CheckWinPopups()
     {
-        if (SocketManager.resultData.WinAmout >= currentTotalBet * 10 && SocketManager.resultData.WinAmout < currentTotalBet * 15)
-        {
-            uiManager.PopulateWin(1, SocketManager.resultData.WinAmout);
-        }
-        else if (SocketManager.resultData.WinAmout >= currentTotalBet * 15 && SocketManager.resultData.WinAmout < currentTotalBet * 20)
-        {
-            uiManager.PopulateWin(2, SocketManager.resultData.WinAmout);
-        }
-        else if (SocketManager.resultData.WinAmout >= currentTotalBet * 20)
-        {
-            uiManager.PopulateWin(3, SocketManager.resultData.WinAmout);
-        }
-        else
-        {
-            CheckPopups = false;
-        }
+        // if (SocketManager.resultData.WinAmout >= currentTotalBet * 10 && SocketManager.resultData.WinAmout < currentTotalBet * 15)
+        // {
+        //     uiManager.PopulateWin(1, SocketManager.resultData.WinAmout);
+        // }
+        // else if (SocketManager.resultData.WinAmout >= currentTotalBet * 15 && SocketManager.resultData.WinAmout < currentTotalBet * 20)
+        // {
+        //     uiManager.PopulateWin(2, SocketManager.resultData.WinAmout);
+        // }
+        // else if (SocketManager.resultData.WinAmout >= currentTotalBet * 20)
+        // {
+        //     uiManager.PopulateWin(3, SocketManager.resultData.WinAmout);
+        // }
+        // else
+        // {
+        //     CheckPopups = false;
+        // }
     }
 
     internal void shuffleInitialMatrix()
@@ -313,8 +323,8 @@ public class SlotController : MonoBehaviour
         {
             for (int j = 0; j < 3; j++)
             {
-                int randomIndex = UnityEngine.Random.Range(0, myImages.Length);
-                slotMatrix[i].slotImages[j].iconImage.sprite = myImages[randomIndex];
+                int randomIndex = UnityEngine.Random.Range(0, iconImages.Length);
+                slotMatrix[i].slotImages[j].iconImage.sprite = iconImages[randomIndex];
             }
         }
     }
@@ -334,12 +344,24 @@ public class SlotController : MonoBehaviour
                 tempIcon.blastAnim.SetActive(false);
                 tempIcon.frontBorder.SetActive(true);
             });
-            tempIcon.transform.SetParent(disableIconsPanel.transform);
+            tempIcon.transform.SetParent(disableIconsPanel.transform.parent);
             animatedIcons.Add(tempIcon);
         }
 
     }
 
+    internal void ShowOnlyIcons(List<string> iconPos)
+    {
+
+        for (int j = 0; j < iconPos.Count; j++)
+        {
+            int[] pos = iconPos[j].Split(',').Select(int.Parse).ToArray();
+            SlotIconView tempIcon = slotMatrix[pos[0]].slotImages[pos[1]];
+            tempIcon.frontBorder.SetActive(true);
+            tempIcon.transform.SetParent(disableIconsPanel.transform.parent);
+            animatedIcons.Add(tempIcon);
+        }
+    }
     internal void StopIconBlastAnimation()
     {
 
@@ -361,7 +383,7 @@ public class SlotController : MonoBehaviour
             SlotIconView tempIcon = slotMatrix[pos[0]].slotImages[pos[1]];
             tempIcon.frontBorder.SetActive(true);
             tempIcon.transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0), 0.3f, 0, 0.3f);
-            tempIcon.transform.SetParent(disableIconsPanel.transform);
+            tempIcon.transform.SetParent(disableIconsPanel.transform.parent);
             animatedIcons.Add(tempIcon);
         }
         // getAnimatedIcons?.Invoke(animatedIcons);
