@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 public class GameManager : MonoBehaviour
@@ -12,26 +13,46 @@ public class GameManager : MonoBehaviour
     [SerializeField] private AudioController audioController;
     [SerializeField] private PaylineController PayLineCOntroller;
 
-    [Header("Action Buttons")]
+    [Header("For spins")]
     [SerializeField] private Button SlotStart_Button;
-    [SerializeField] private Button AutoSpin_Button;
-    [SerializeField] private Button AutoSpinStop_Button;
     [SerializeField] private Button Maxbet_button;
     [SerializeField] private Button BetMinus_Button;
     [SerializeField] private Button BetPlus_Button;
-
-    [Header("info text")]
     [SerializeField] private TMP_Text betPerLine_text;
     [SerializeField] private TMP_Text totalBet_text;
-
     [SerializeField] private bool isSpinning;
+
+    [Header("For auto spins")]
+    [SerializeField] private Button AutoSpin_Button;
+    [SerializeField] private Button AutoSpinStop_Button;
+    [SerializeField] private TMP_Text AUtoSpinCountText;
+    [SerializeField] TMP_Dropdown autoSpinDropDown;
+    [SerializeField] TMP_Dropdown betPerLineDropDown;
+
     [SerializeField] private bool isAutoSpin;
-    [SerializeField] private int autoSpinCount;
     [SerializeField] private bool isFreeSpin;
     [SerializeField] private bool freeSpinStarted;
     [SerializeField] private double currentBalance;
     [SerializeField] private double currentTotalBet;
     [SerializeField] private int betCounter = 0;
+    [SerializeField] private int autoCounter = 0;
+    [SerializeField] private int autoSpinCounter;
+    List<int> autoOptions = new List<int>() { 15, 20, 25, 30, 40, 100 };
+
+    [Header("For Gamble")]
+    [SerializeField] private Button Double_Button;
+    [SerializeField] private Button Head_option;
+    [SerializeField] private Button Tail_Option;
+    [SerializeField] private Button Collect_Option;
+    [SerializeField] private Button allGambleButton;
+    [SerializeField] private Button halfGambleButton;
+    [SerializeField] private GameObject gambleObject;
+    [SerializeField] private ImageAnimation coinAnim;
+    [SerializeField] private string option;
+
+
+
+
     private Coroutine autoSpinRoutine;
     private Coroutine iterativeRoutine;
 
@@ -39,10 +60,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private int maxIterationWinShow;
     [SerializeField] private int winIterationCount;
-    void Awake()
-    {
 
-    }
+    public double currenwinning;
     void Start()
     {
         socketController.OnInit = InitGame;
@@ -51,8 +70,10 @@ public class GameManager : MonoBehaviour
 
         SlotStart_Button.onClick.RemoveAllListeners();
         SlotStart_Button.onClick.AddListener(ExecuteSpin);
+
         AutoSpin_Button.onClick.RemoveAllListeners();
         AutoSpin_Button.onClick.AddListener(ExecuteAutoSpin);
+
         AutoSpinStop_Button.onClick.AddListener(() =>
         {
 
@@ -63,23 +84,85 @@ public class GameManager : MonoBehaviour
         BetMinus_Button.onClick.AddListener(() => { OnBetChange(false); });
         Maxbet_button.onClick.AddListener(MaxBet);
 
+        Double_Button.onClick.RemoveAllListeners();
+        Double_Button.onClick.AddListener(() =>
+        {
+            OnInitGamble();
+
+        });
+        Head_option.onClick.RemoveAllListeners();
+        Head_option.onClick.AddListener(() =>
+        {
+            StartCoroutine(OnSelectGamble("HEAD"));
+
+        });
+
+        Tail_Option.onClick.RemoveAllListeners();
+        Tail_Option.onClick.AddListener(() =>
+        {
+            StartCoroutine(OnSelectGamble("TAIL"));
+
+        });
+        Collect_Option.onClick.RemoveAllListeners();
+        Collect_Option.onClick.AddListener(() =>
+        {
+
+            StartCoroutine(OnGambleCollect());
+        });
+
+        allGambleButton.onClick.RemoveAllListeners();
+        allGambleButton.onClick.AddListener(() => changeGambleType(true));
+
+        halfGambleButton.onClick.RemoveAllListeners();
+        halfGambleButton.onClick.AddListener(() => changeGambleType(false));
+
+        autoSpinDropDown.onValueChanged.AddListener((int index) =>
+        {
+            autoSpinCounter = index;
+        });
+
+        betPerLineDropDown.onValueChanged.AddListener((int index) =>
+        {
+
+            betCounter = index;
+        });
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            object gambleInitData = new { data = new { }, id = "GAMBLEINIT" };
+            socketController.SendData("message", gambleInitData);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            object gambleResData = new { data = new { selected = "HEAD", gambleOption = "ALL" }, id = "GAMBLERESULT" };
+            socketController.SendData("message", gambleResData);
+
+        }
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            object gambleResData = new { data = new { }, id = "GAMBLECOLLECT" };
+            socketController.SendData("message", gambleResData);
+
+        }
+
     }
 
     void InitGame()
     {
-        // for (int i = 0; i < LineIds.Count; i++)
-        // {
-        //     slotManager.FetchLines(LineIds[i], i);
-        // }
 
         betCounter = 0;
         currentTotalBet = socketController.socketModel.initGameData.Bets[betCounter] * socketController.socketModel.initGameData.lineData.Count;
 
         if (totalBet_text) totalBet_text.text = currentTotalBet.ToString();
-        Debug.Log(socketController.socketModel.initGameData.Bets[betCounter]);
         if (betPerLine_text) betPerLine_text.text = socketController.socketModel.initGameData.Bets[betCounter].ToString();
         PayLineCOntroller.paylines = socketController.socketModel.initGameData.lineData;
         uIManager.UpdatePlayerInfo(socketController.socketModel.playerData);
+        PopulateAutoSpinDropDown();
+        PopulateBetPerlineDropDown();
         Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
 
     }
@@ -93,7 +176,7 @@ public class GameManager : MonoBehaviour
 
     void ExecuteAutoSpin()
     {
-        if (!isSpinning && autoSpinCount > 0)
+        if (!isSpinning && autoSpinCounter > 0)
         {
 
             isAutoSpin = true;
@@ -105,9 +188,9 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator AutoSpinRoutine()
     {
-        while (autoSpinCount > 0 && isAutoSpin)
+        while (autoSpinCounter > 0 && isAutoSpin)
         {
-            autoSpinCount--;
+            autoSpinCounter--;
             yield return SpinRoutine();
             yield return new WaitForSeconds(1);
         }
@@ -200,12 +283,12 @@ public class GameManager : MonoBehaviour
             yield return iterativeRoutine;
         }
 
-            slotManager.ShowOnlyIcons(Helper.FlattenSymbolsToEmit(socketController.socketModel.resultGameData.symbolsToEmit));
-            for (int i = 0; i < socketController.socketModel.resultGameData.linesToEmit.Count; i++)
-            {
+        slotManager.ShowOnlyIcons(Helper.FlattenSymbolsToEmit(socketController.socketModel.resultGameData.symbolsToEmit));
+        for (int i = 0; i < socketController.socketModel.resultGameData.linesToEmit.Count; i++)
+        {
 
-                PayLineCOntroller.GeneratePayline(socketController.socketModel.resultGameData.linesToEmit[i] - 1, false);
-            }
+            PayLineCOntroller.GeneratePayline(socketController.socketModel.resultGameData.linesToEmit[i] - 1, false);
+        }
     }
 
     private IEnumerator IterativeWinShowRoutine(List<List<string>> symbolsToEmit)
@@ -240,6 +323,78 @@ public class GameManager : MonoBehaviour
         slotManager.IconShakeAnim(new int[] { 1, 1 }, new int[] { 2, 1 });
         yield return new WaitForSeconds(1f);
         slotManager.FreeSpinVHAnim(1);
+    }
+
+    void OnInitGamble()
+    {
+        object gambleInitData = new { data = new { }, id = "GAMBLEINIT" };
+        socketController.SendData("message", gambleInitData);
+        changeGambleType(true);
+        uIManager.UpdategambleInfo(currenwinning);
+        gambleObject.SetActive(true);
+
+
+    }
+    IEnumerator OnSelectGamble(string type)
+    {
+        ToggleGambleBtnGrp(false);
+        coinAnim.StartAnimation();
+        object gambleResData = new { data = new { selected = type, gambleOption = option }, id = "GAMBLERESULT" };
+        socketController.SendData("message", gambleResData);
+        yield return new WaitUntil(() => socketController.isResultdone);
+        uIManager.UpdategambleInfo(socketController.socketModel.gambleData.currentWinning);
+        if(socketController.socketModel.gambleData.currentWinning<=0){
+
+            yield return OnGambleCollect();
+        }
+        coinAnim.StopAnimation();
+        ToggleGambleBtnGrp(true);
+
+    }
+
+    IEnumerator OnGambleCollect()
+    {
+        ToggleGambleBtnGrp(false);
+        object gambleResData = new { data = new { }, id = "GAMBLECOLLECT" };
+        socketController.SendData("message", gambleResData);
+        yield return new WaitUntil(() => socketController.isResultdone);
+        PlayerData playerData = new PlayerData();
+        playerData.currentWining = socketController.socketModel.gambleData.currentWinning;
+        playerData.Balance = socketController.socketModel.gambleData.balance;
+        uIManager.UpdatePlayerInfo(playerData);
+        gambleObject.SetActive(false);
+        ToggleGambleBtnGrp(true);
+
+
+    }
+
+    internal void changeGambleType(bool full)
+    {
+
+        if (full)
+        {
+            halfGambleButton.transform.GetChild(0).gameObject.SetActive(false);
+            allGambleButton.transform.GetChild(0).gameObject.SetActive(true);
+            option = "ALL";
+        }
+        else
+        {
+            halfGambleButton.transform.GetChild(0).gameObject.SetActive(true);
+            allGambleButton.transform.GetChild(0).gameObject.SetActive(false);
+            option = "HALF";
+
+        }
+
+    }
+
+    void ToggleGambleBtnGrp(bool toggle)
+    {
+        Head_option.interactable = toggle;
+        Tail_Option.interactable = toggle;
+        Collect_Option.interactable = toggle;
+        allGambleButton.interactable = toggle;
+        halfGambleButton.interactable = toggle;
+
     }
     void ToggleButtonGrp(bool toggle)
     {
@@ -290,5 +445,55 @@ public class GameManager : MonoBehaviour
             uIManager.LowBalPopup();
     }
 
+    private void PopulateAutoSpinDropDown()
+    {
+        autoSpinDropDown.ClearOptions();
+        List<string> autoOptionsString = new List<string>();
+
+        for (int i = 0; i < autoOptions.Count; i++)
+        {
+            autoOptionsString.Add(autoOptions[i].ToString());
+        }
+        autoSpinDropDown.AddOptions(autoOptionsString);
+        autoSpinDropDown.value = 0;
+        autoSpinDropDown.RefreshShownValue();
+    }
+
+    private void PopulateBetPerlineDropDown()
+    {
+
+
+        betPerLineDropDown.ClearOptions();
+
+        List<string> betOptionsString = new List<string>();
+
+        for (int i = 0; i < socketController.socketModel.initGameData.Bets.Count; i++)
+        {
+            betOptionsString.Add(socketController.socketModel.initGameData.Bets[i].ToString());
+        }
+
+        betPerLineDropDown.AddOptions(betOptionsString);
+
+        betPerLineDropDown.value = 0;
+        betPerLineDropDown.RefreshShownValue();
+
+    }
+
+    private void OnDropdownValueChanged(bool autoSpin)
+    {
+
+
+        if (autoSpin)
+        {
+
+        }
+
+    }
+
+    private double CalculateCost()
+    {
+
+        return 0;
+    }
 
 }

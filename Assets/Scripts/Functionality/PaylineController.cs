@@ -51,7 +51,6 @@ public class PaylineController : MonoBehaviour
 
     internal void GeneratePayline( int lineId, bool destroy=true)
     {
-        Debug.Log("line id, "+lineId);
         UILineRenderer line = Instantiate(Line_Prefab, LineContainer);
         if(!destroy)
         dontDestroyLines.Add(line.gameObject);

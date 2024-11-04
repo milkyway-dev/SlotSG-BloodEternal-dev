@@ -12,11 +12,11 @@ public class SocketController : MonoBehaviour
 {
 
 
-    internal SocketModel socketModel= new SocketModel();
+    internal SocketModel socketModel = new SocketModel();
 
 
     //WebSocket currentSocket = null;
-    internal bool isResultdone = false;
+    [SerializeField]internal bool isResultdone = false;
 
     private SocketManager manager;
 
@@ -239,8 +239,8 @@ public class SocketController : MonoBehaviour
         string id = resp["id"].ToString();
         var message = resp["message"];
         var gameData = message["GameData"];
-        var playerData= message["PlayerData"];
-        socketModel.playerData=message["PlayerData"].ToObject<PlayerData>();
+        var playerData = message["PlayerData"];
+        socketModel.playerData = message["PlayerData"]?.ToObject<PlayerData>();
         switch (id)
         {
             case "InitData":
@@ -262,6 +262,31 @@ public class SocketController : MonoBehaviour
                     // playerdata = myData.message.PlayerData;
 
                     isResultdone = true;
+                    break;
+                }
+            case "GAMBLEINIT":
+                {
+                    isResultdone = true;
+                    break;
+                }
+            case "GambleResult":
+                {
+                    socketModel.gambleData.currentWinning = message["currentWinning"].ToObject<double>();
+                    socketModel.gambleData.playerWon = message["playerWon"].ToObject<bool>();
+                    socketModel.gambleData.coin = message["coin"].ToObject<string>();
+                    Debug.Log("result" + JsonConvert.SerializeObject(socketModel.gambleData));
+                    isResultdone = true;
+
+                    break;
+                }
+            case "GambleCollect":
+                {
+                    socketModel.gambleData.currentWinning = message["currentWinning"].ToObject<double>();
+                    socketModel.gambleData.balance = message["balance"].ToObject<double>();
+                    Debug.Log("collect" + JsonConvert.SerializeObject(socketModel.gambleData));
+                    isResultdone = true;
+
+
                     break;
                 }
             case "ExitUser":
