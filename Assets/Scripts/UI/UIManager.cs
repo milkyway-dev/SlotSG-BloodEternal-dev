@@ -10,32 +10,39 @@ using UnityEngine.Networking;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField]
-    private Button About_Button;
 
     [Header("Auto SpinPopup")]
     [SerializeField] private Button AutoSpinButton;
     [SerializeField] private Button AutoSpinPopUpClose;
+    [SerializeField] private TMP_Text autoSpinCost;
+    [SerializeField] private GameObject autoSpinPopupObject;
 
     [Header("Popus UI")]
-    [SerializeField]
-    private GameObject MainPopup_Object;
+    [SerializeField] private GameObject MainPopup_Object;
 
-    [Header("About Popup")]
-    [SerializeField]
-    private GameObject AboutPopup_Object;
-    [SerializeField]
-    private Button AboutExit_Button;
+    [Header("Paytable Popup")]
+    [SerializeField] private Button paytable_Button;
+    [SerializeField] private GameObject payTablePopup_Object;
+    [SerializeField] private Button paytableExit_Button;
+    
+    
+    [Header("Paytable Texts")]
+    [SerializeField] private TMP_Text[] SymbolsText;
+    [SerializeField] private TMP_Text Scatter_Text;
+    [SerializeField] private TMP_Text Wild_Text;
+
+    [Header("Pagination")]
+    int CurrentIndex = 0;
+    [SerializeField] private GameObject[] paytableList;
+    [SerializeField] private Button RightBtn;
+    [SerializeField] private Button LeftBtn;
 
     [Header("Gambel texts")]
     [SerializeField] private TMP_Text bank;
     [SerializeField] private TMP_Text bet;
     [SerializeField] private TMP_Text potentialWin;
 
-    [Header("Paytable Texts")]
-    [SerializeField] private TMP_Text[] SymbolsText;
-    [SerializeField] private TMP_Text Scatter_Text;
-    [SerializeField] private TMP_Text Wild_Text;
+
 
 
     [Header("Settings Popup")]
@@ -95,11 +102,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button CloseAD_Button;
     [SerializeField] private GameObject ADPopup_Object;
 
-    [Header("Pagination")]
-    int CurrentIndex = 0;
-    [SerializeField] private GameObject[] paytableList;
-    [SerializeField] private Button RightBtn;
-    [SerializeField] private Button LeftBtn;
+
 
     [SerializeField]
     private Button m_AwakeGameButton;
@@ -131,8 +134,8 @@ public class UIManager : MonoBehaviour
         SetButton(yes_Button, CallOnExitFunction);
         SetButton(no_Button, () => { if (!isExit) { ClosePopup(QuitPopupObject); } });
         SetButton(GameExit_Button, () => OpenPopup(QuitPopupObject));
-        SetButton(About_Button, () => OpenPopup(AboutPopup_Object));
-        SetButton(AboutExit_Button, () => ClosePopup(AboutPopup_Object));
+        SetButton(paytable_Button, () => OpenPopup(payTablePopup_Object));
+        SetButton(paytableExit_Button, () => ClosePopup(payTablePopup_Object));
         SetButton(Settings_Button, () => OpenPopup(SettingsPopup_Object));
         SetButton(SettingsExit_Button, () => ClosePopup(SettingsPopup_Object));
         SetButton(MusicOn_Button, ToggleMusic);
@@ -144,7 +147,8 @@ public class UIManager : MonoBehaviour
         SetButton(CloseDisconnect_Button, CallOnExitFunction);
         SetButton(Close_Button, CallOnExitFunction);
         SetButton(QuitSplash_button, () => OpenPopup(QuitPopupObject));
-
+        SetButton(AutoSpinButton,()=>OpenPopup(autoSpinPopupObject));
+        SetButton(AutoSpinPopUpClose,()=>ClosePopup(autoSpinPopupObject));
         // Initialize other settings
         paytableList[CurrentIndex = 0].SetActive(true);
         isMusic = false;
@@ -209,10 +213,10 @@ public class UIManager : MonoBehaviour
         // gambleObject.SetActive(true);
     }
 
-    internal void UpdategambleInfo(double currentWinnings){
+    internal void UpdategambleInfo(double currentWinnings,bool half=false){
         bank.text=currentWinnings.ToString();
-        bet.text=currentWinnings.ToString();
-        potentialWin.text=(currentWinnings*2).ToString();
+        bet.text=half? (currentWinnings/2).ToString() : currentWinnings.ToString();
+        potentialWin.text=half?currentWinnings.ToString() : (currentWinnings*2).ToString();
 
     }
     internal void OnCollect(){
@@ -283,55 +287,35 @@ public class UIManager : MonoBehaviour
         });
     }
 
+    internal void UpdateAutoSpinCost(double cost){
+        autoSpinCost.text=cost.ToString();
+    }
     internal void LowBalPopup()
     {
 
         OpenPopup(LowBalancePopup_Object);
     }
 
-    internal void InitialiseUIData(string SupportUrl, string AbtImgUrl, string TermsUrl, string PrivacyUrl, Paylines symbolsText)
-    {
-        PopulateSymbolsPayout(symbolsText);
-    }
+
 
     internal void ADfunction()
     {
         OpenPopup(ADPopup_Object);
     }
 
-    private void PopulateSymbolsPayout(Paylines paylines)
+    internal void PopulateSymbolsPayout(List<Symbol> symbols)
     {
-        // for (int i = 0; i < SymbolsText.Length; i++)
-        // {
-        //     string text = null;
-        //     if (paylines.symbols[i].Multiplier[0][0] != 0)
-        //     {
-        //         text += "5x - " + paylines.symbols[i].Multiplier[0][0];
-        //     }
-        //     if (paylines.symbols[i].Multiplier[1][0] != 0)
-        //     {
-        //         text += "\n4x - " + paylines.symbols[i].Multiplier[1][0];
-        //     }
-        //     if (paylines.symbols[i].Multiplier[2][0] != 0)
-        //     {
-        //         text += "\n3x - " + paylines.symbols[i].Multiplier[2][0];
-        //     }
-        //     if (SymbolsText[i]) SymbolsText[i].text = text;
-        // }
-
-        for (int i = 0; i < paylines.symbols.Count; i++)
+        for (int i = 0; i < SymbolsText.Length; i++)
         {
-
-            if (paylines.symbols[i].Name.ToUpper() == "SCATTER")
+            string text = "";
+            for (int j = 0; j < symbols[i].Multiplier.Count; j++)
             {
-                if (Scatter_Text) Scatter_Text.text = paylines.symbols[i].description.ToString();
+                text += $"{6-j}x - {symbols[i].Multiplier[j][0]} \n";
             }
-
-            if (paylines.symbols[i].Name.ToUpper() == "WILD")
-            {
-                if (Wild_Text) Wild_Text.text = paylines.symbols[i].description.ToString();
-            }
+            if (SymbolsText[i]) SymbolsText[i].text = text;
         }
+
+
     }
 
     private void CallOnExitFunction()

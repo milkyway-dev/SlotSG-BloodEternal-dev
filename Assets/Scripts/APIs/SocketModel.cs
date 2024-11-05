@@ -39,6 +39,11 @@ public class ResultGameData
     public List<int> linesToEmit { get; set; }
     public List<List<string>> symbolsToEmit { get; set; }
     public bool isFreeSpin {get; set;}
+    public List<string> vampHuman {get; set;}
+
+    public List<string> bloodSplash {get; set;}
+    // public freeSpin freeSpin{get; set;}
+    public int count {get; set;}
     public int freeSpinCount { get; set; }
     public double jackpot { get; set; }
 }
@@ -60,6 +65,13 @@ public class InitGameData
 public class UIData
 {
     public List<Symbol> symbols { get; set; }
+
+}
+
+[Serializable]
+public class freeSpin{
+
+
 
 }
 
@@ -101,28 +113,13 @@ public class AbtLogo
 }
 
 
-// [Serializable]
-// public class UIData
-// {
-//     public Paylines paylines { get; set; }
-//     public List<string> spclSymbolTxt { get; set; }
-//     public AbtLogo AbtLogo { get; set; }
-//     public string ToULink { get; set; }
-//     public string PopLink { get; set; }
-// }
-
-[Serializable]
-public class Paylines
-{
-    public List<Symbol> symbols { get; set; }
-}
 
 [Serializable]
 public class Symbol
 {
     public int ID { get; set; }
     public string Name { get; set; }
-    public JToken Multiplier { get; set;}
+    public List<List<int>> Multiplier { get; set;}
     public object defaultAmount { get; set; }
     public object symbolsCount { get; set; }
     public object increaseValue { get; set; }
@@ -138,9 +135,9 @@ public class GambleData{
     public double currentWinning{get; set;}
     public string coin{get; set;}
     public double balance{get; set;}
-            
 
 }
+
 
 [Serializable]
 public class PlayerData

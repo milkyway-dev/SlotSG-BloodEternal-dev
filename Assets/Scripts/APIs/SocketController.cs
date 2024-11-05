@@ -260,12 +260,7 @@ public class SocketController : MonoBehaviour
                     // myData.message.GameData.FinalsymbolsToEmit = TransformAndRemoveRecurring(myData.message.GameData.symbolsToEmit);
                     // resultData = myData.message.GameData;
                     // playerdata = myData.message.PlayerData;
-
-                    isResultdone = true;
-                    break;
-                }
-            case "GAMBLEINIT":
-                {
+                    Debug.Log("result data"+JsonConvert.SerializeObject(socketModel.resultGameData));
                     isResultdone = true;
                     break;
                 }

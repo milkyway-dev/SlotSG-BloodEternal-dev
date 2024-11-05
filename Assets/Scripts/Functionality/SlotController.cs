@@ -121,27 +121,7 @@ public class SlotController : MonoBehaviour
     private void Start()
     {
 
-        shuffleInitialMatrix();
-
-        // IsAutoSpin = false;
-        // if (SlotStart_Button) SlotStart_Button.onClick.RemoveAllListeners();
-        // if (SlotStart_Button) SlotStart_Button.onClick.AddListener(delegate { StartSlots(); });
-
-
-        // if (AutoSpin_Button) AutoSpin_Button.onClick.RemoveAllListeners();
-        // if (AutoSpin_Button) AutoSpin_Button.onClick.AddListener(AutoSpin);
-
-        // if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.RemoveAllListeners();
-        // if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.AddListener(StopAutoSpin);
-
-        // if (BetPlus_Button) BetPlus_Button.onClick.RemoveAllListeners();
-        // if (BetPlus_Button) BetPlus_Button.onClick.AddListener(delegate { ChangeBet(true); });
-        // if (BetMinus_Button) BetMinus_Button.onClick.RemoveAllListeners();
-        // if (BetMinus_Button) BetMinus_Button.onClick.AddListener(delegate { ChangeBet(false); });
-
-        // if (MaxBet_Button) MaxBet_Button.onClick.RemoveAllListeners();
-        // if (MaxBet_Button) MaxBet_Button.onClick.AddListener(MaxBet);
-        // tweenHeight = (16 * IconSizeFactor) - 280;
+        // shuffleInitialMatrix();
     }
 
 
@@ -180,12 +160,9 @@ public class SlotController : MonoBehaviour
         PayCalculator.ResetStaticLine();
     }
 
-    //just for testing purposes delete on production
 
 
     // [x]
-
-
 
 
     private void BalanceDeduction()
@@ -254,49 +231,58 @@ public class SlotController : MonoBehaviour
             for (int i = 0; i < slotMatrix.Count; i++)
             {
                 slotMatrix[i].slotImages[j].iconImage.sprite = iconImages[resultData[j][i]];
+                if (resultData[j][i] == 11 || resultData[j][i] == 12 || resultData[j][i] == 13 || resultData[j][i] == 14)
+                {
+
+                    slotMatrix[i].slotImages[j].bgGlow.gameObject.SetActive(true);
+                    slotMatrix[i].slotImages[j].bgGlow.StartAnimation();
+                }
+
             }
         }
     }
     internal IEnumerator StopSpin(float delay1 = 0, float delay2 = 0, List<int[]> vHPos = null)
     {
 
+        DeActivateReelBorder();
         for (int i = 0; i < Slot_Transform.Length; i++)
         {
             if (delay1 > 0 && i == 2)
             {
-                DeActivateReelBorder();
                 ActivateReelBorder("red");
                 yield return new WaitForSeconds(delay1);
             }
 
             if (delay2 > 0 && i == 4)
             {
-                DeActivateReelBorder();
+                // DeActivateReelBorder();
                 ActivateReelBorder("blue");
                 yield return new WaitForSeconds(delay2);
             }
 
             StopTweening(Slot_Transform[i], i);
             yield return new WaitForSeconds(0.25f);
-            if (i > 0 && i < 5 && vHPos != null)
-            {
-
-                for (int k = 0; k < vHPos.Count; k++)
-                {
-                    if (vHPos[k][0] == i)
-                    {
-                        EnableIconGlow(vHPos[k]);
-                    }
-
-                }
-            }
-
         }
         KillAllTweens();
         DeActivateReelBorder();
 
     }
 
+    internal float[] CalculateDelay(List<List<int>> resultData)
+    {
+        float[] delay = new float[] { 0, 0 };
+
+        for (int i = 0; i < resultData.Count; i++)
+        {
+            if (resultData[i][1] == 11)
+                delay[0] = 1f;
+            else if (resultData[i][3] == 13)
+                delay[1] = 1f;
+
+        }
+
+        return delay;
+    }
     internal void CheckWinPopups()
     {
         // if (SocketManager.resultData.WinAmout >= currentTotalBet * 10 && SocketManager.resultData.WinAmout < currentTotalBet * 15)
@@ -331,13 +317,18 @@ public class SlotController : MonoBehaviour
 
 
 
-    internal void StartIconBlastAnimation(List<string> iconPos)
+    internal void StartIconBlastAnimation(List<string> iconPos, bool opposite = false)
     {
         // IconController tempIcon; 
         for (int j = 0; j < iconPos.Count; j++)
         {
+            SlotIconView tempIcon;
             int[] pos = iconPos[j].Split(',').Select(int.Parse).ToArray();
-            SlotIconView tempIcon = slotMatrix[pos[0]].slotImages[pos[1]];
+            if (opposite)
+                tempIcon = slotMatrix[pos[1]].slotImages[pos[0]];
+            else
+                tempIcon = slotMatrix[pos[0]].slotImages[pos[1]];
+
             tempIcon.blastAnim.SetActive(true);
             tempIcon.blastAnim.transform.DOScale(new Vector2(1.1f, 1.1f), 0.35f).SetEase(Ease.OutBack).OnComplete(() =>
             {
@@ -377,16 +368,33 @@ public class SlotController : MonoBehaviour
     }
     internal void StartIconAnimation(List<string> iconPos)
     {
+        SlotIconView tempIcon = null;
         for (int j = 0; j < iconPos.Count; j++)
         {
             int[] pos = iconPos[j].Split(',').Select(int.Parse).ToArray();
-            SlotIconView tempIcon = slotMatrix[pos[0]].slotImages[pos[1]];
+            tempIcon = slotMatrix[pos[0]].slotImages[pos[1]];
             tempIcon.frontBorder.SetActive(true);
             tempIcon.transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0), 0.3f, 0, 0.3f);
             tempIcon.transform.SetParent(disableIconsPanel.transform.parent);
             animatedIcons.Add(tempIcon);
         }
         // getAnimatedIcons?.Invoke(animatedIcons);
+
+    }
+
+    internal void ShowWildAndBloodANimation(List<string> iconPos)
+    {
+
+        SlotIconView tempIcon = null;
+        for (int j = 0; j < iconPos.Count; j++)
+        {
+            int[] pos = iconPos[j].Split(',').Select(int.Parse).ToArray();
+            tempIcon = slotMatrix[pos[1]].slotImages[pos[0]];
+            tempIcon.bloodSplatter.transform.localScale *= 0;
+            tempIcon.bloodSplatter.gameObject.SetActive(true);
+            tempIcon.bloodSplatter.transform.DOScale(Vector3.one, 0.75f);
+            animatedIcons.Add(tempIcon);
+        }
 
     }
 
@@ -398,6 +406,10 @@ public class SlotController : MonoBehaviour
             item.frontBorder.SetActive(false);
             item.transform.localScale = Vector3.one;
             item.transform.SetParent(item.parent);
+            item.transform.localPosition = item.defaultPos;
+            item.transform.SetSiblingIndex(item.siblingIndex);
+            item.bloodSplatter.transform.localScale = Vector3.one; ;
+            item.bloodSplatter.gameObject.SetActive(false);
         }
         animatedIcons.Clear();
     }
@@ -430,24 +442,45 @@ public class SlotController : MonoBehaviour
 
 
     }
-    internal void FreeSpinVHAnim(int index)
+    internal void FreeSpinVHAnim(List<string> pos)
     {
-        VHObjectsBlue[index].gameObject.SetActive(true);
-        VHObjectsBlue[index].StartAnimation();
-        VHObjectsBlue[index].transform.DOPunchScale(new Vector3(0.4f, 0.4f, 0), 0.3f, 0, 1.2f);
+        for (int i = 0; i < pos.Count; i++)
+        {
+            if (i % 2 != 0) continue;
+
+            int[] iconPos = pos[i].Split(',').Select(int.Parse).ToArray();
+            if (iconPos[1] == 1)
+            {
+                VHObjectsRed[iconPos[0]].gameObject.SetActive(true);
+                VHObjectsRed[iconPos[0]].StartAnimation();
+                VHObjectsRed[iconPos[0]].transform.DOPunchScale(new Vector3(0.4f, 0.4f, 0), 0.3f, 0, 1.2f);
+            }
+            else if (iconPos[1] == 3)
+            {
+                VHObjectsBlue[iconPos[0]].gameObject.SetActive(true);
+                VHObjectsBlue[iconPos[0]].StartAnimation();
+                VHObjectsBlue[iconPos[0]].transform.DOPunchScale(new Vector3(0.4f, 0.4f, 0), 0.3f, 0, 1.2f);
+            }
+
+        }
+
     }
 
-    internal void IconShakeAnim(int[] icon1, int[] icon2)
+    internal void IconShakeAnim(List<string> vhPos)
     {
+        int[] pos;
+        for (int i = 0; i < vhPos.Count; i++)
+        {
+            pos = vhPos[i].Split(',').Select(int.Parse).ToArray();
+            slotMatrix[pos[1]].slotImages[pos[0]].transform.DOShakePosition(1f, strength: new Vector3(25, 25, 0), vibrato: 20, randomness: 90, fadeOut: true);
 
-        slotMatrix[icon1[0]].slotImages[icon1[1]].transform.DOShakePosition(1f, strength: new Vector3(20, 20, 0), vibrato: 20, randomness: 90, fadeOut: true);
-        slotMatrix[icon2[0]].slotImages[icon2[1]].transform.DOShakePosition(1f, strength: new Vector3(20, 20, 0), vibrato: 20, randomness: 90, fadeOut: true);
+        }
     }
 
     void EnableIconGlow(int[] pos)
     {
-        glowMatrix[pos[0]].row[pos[1]].gameObject.SetActive(true);
-        glowMatrix[pos[0]].row[pos[1]].StartAnimation();
+        slotMatrix[pos[0]].slotImages[pos[1]].bgGlow.gameObject.SetActive(true);
+        slotMatrix[pos[0]].slotImages[pos[1]].bgGlow.StartAnimation();
 
     }
 
@@ -457,8 +490,8 @@ public class SlotController : MonoBehaviour
         {
             for (int j = 0; j < glowMatrix[i].row.Count; j++)
             {
-                glowMatrix[i].row[j].gameObject.SetActive(false);
-                glowMatrix[i].row[j].StopAnimation();
+                slotMatrix[i].slotImages[j].bgGlow.gameObject.SetActive(false);
+                slotMatrix[i].slotImages[j].bgGlow.StopAnimation();
             }
 
         }

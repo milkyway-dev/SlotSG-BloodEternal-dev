@@ -67,6 +67,9 @@ MonoBehaviour:
   iconImage: {fileID: 1497386177277217602}
   parent: {fileID: 0}
   frontBorder: {fileID: 6715663629310119295}
+  defaultPos: {x: 0, y: 0, z: 0}
+  bgGlow: {fileID: 8810448181036851652}
+  siblingIndex: 0
   blastAnim: {fileID: 9041845832351880731}
   bloodSplatter: {fileID: 7773817477702002691}
   wildObject: {fileID: 3712149114452257236}
@@ -599,7 +602,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3788179215312650445
 CanvasRenderer:
@@ -629,7 +632,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 4a26bec76b98b4dadbb93ff2fcd1b335, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
