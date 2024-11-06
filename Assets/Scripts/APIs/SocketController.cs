@@ -240,7 +240,8 @@ public class SocketController : MonoBehaviour
         var message = resp["message"];
         var gameData = message["GameData"];
         var playerData = message["PlayerData"];
-        socketModel.playerData = message["PlayerData"]?.ToObject<PlayerData>();
+        if(message["PlayerData"]!=null)
+        socketModel.playerData = message["PlayerData"].ToObject<PlayerData>();
         switch (id)
         {
             case "InitData":
@@ -268,7 +269,7 @@ public class SocketController : MonoBehaviour
                 {
                     socketModel.gambleData.currentWinning = message["currentWinning"].ToObject<double>();
                     socketModel.gambleData.playerWon = message["playerWon"].ToObject<bool>();
-                    socketModel.gambleData.coin = message["coin"].ToObject<string>();
+                    socketModel.gambleData.coin = message["coin"]!=null? message["coin"].ToObject<string>():"";
                     Debug.Log("result" + JsonConvert.SerializeObject(socketModel.gambleData));
                     isResultdone = true;
 

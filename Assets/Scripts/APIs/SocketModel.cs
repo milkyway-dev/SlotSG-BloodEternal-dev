@@ -42,9 +42,11 @@ public class ResultGameData
     public List<string> vampHuman {get; set;}
 
     public List<string> bloodSplash {get; set;}
+
+    public List<string> batPositions {get; set;}
     // public freeSpin freeSpin{get; set;}
     public int count {get; set;}
-    public int freeSpinCount { get; set; }
+    // public int freeSpinCount { get; set; }
     public double jackpot { get; set; }
 }
 

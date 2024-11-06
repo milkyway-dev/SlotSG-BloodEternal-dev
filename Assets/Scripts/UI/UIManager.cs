@@ -6,16 +6,17 @@ using UnityEngine.UI;
 using System.Linq;
 using TMPro;
 using System;
-using UnityEngine.Networking;
-
 public class UIManager : MonoBehaviour
 {
 
-    [Header("Auto SpinPopup")]
+    [Header("AutoSpin Popup")]
     [SerializeField] private Button AutoSpinButton;
     [SerializeField] private Button AutoSpinPopUpClose;
     [SerializeField] private TMP_Text autoSpinCost;
     [SerializeField] private GameObject autoSpinPopupObject;
+    [Header("Free Spin Popup")]
+    [SerializeField] private GameObject FreeSPinPopUpObject;
+    [SerializeField] private TMP_Text FreeSpinCount;
 
     [Header("Popus UI")]
     [SerializeField] private GameObject MainPopup_Object;
@@ -24,8 +25,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button paytable_Button;
     [SerializeField] private GameObject payTablePopup_Object;
     [SerializeField] private Button paytableExit_Button;
-    
-    
+
+
     [Header("Paytable Texts")]
     [SerializeField] private TMP_Text[] SymbolsText;
     [SerializeField] private TMP_Text Scatter_Text;
@@ -37,12 +38,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button RightBtn;
     [SerializeField] private Button LeftBtn;
 
-    [Header("Gambel texts")]
+    [Header("Gamble texts")]
     [SerializeField] private TMP_Text bank;
     [SerializeField] private TMP_Text bet;
     [SerializeField] private TMP_Text potentialWin;
-
-
 
 
     [Header("Settings Popup")]
@@ -55,18 +54,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button MusicOff_Button;
 
     [Header("all Win Popup")]
-    [SerializeField]
-    private Sprite BigWin_Sprite;
-    [SerializeField]
-    private Sprite HugeWin_Sprite;
-    [SerializeField]
-    private Sprite MegaWin_Sprite;
-    [SerializeField]
-    private Image Win_Image;
-    [SerializeField]
-    private GameObject WinPopup_Object;
-    [SerializeField]
-    private TMP_Text Win_Text;
+    [SerializeField] private GameObject specialWinObject;
+
+    [SerializeField] private ImageAnimation normalWinImage;
+    [SerializeField] private TMP_Text specialWinTitle;
+    [SerializeField] private GameObject WinPopup_Object;
+    [SerializeField] private TMP_Text Win_Text;
 
     [Header("jackpot Win Popup")]
     [SerializeField] private TMP_Text jackpot_Text;
@@ -114,6 +107,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text playerCurrentWinning;
     [SerializeField] private TMP_Text playerBalance;
 
+    [SerializeField] private GameObject currentPopup;
     private void Awake()
     {
         //if (spalsh_screen) spalsh_screen.SetActive(true);
@@ -132,12 +126,12 @@ public class UIManager : MonoBehaviour
     {
         // Set up each button with the appropriate action
         SetButton(yes_Button, CallOnExitFunction);
-        SetButton(no_Button, () => { if (!isExit) { ClosePopup(QuitPopupObject); } });
+        SetButton(no_Button, () => { if (!isExit) { ClosePopup(); } });
         SetButton(GameExit_Button, () => OpenPopup(QuitPopupObject));
         SetButton(paytable_Button, () => OpenPopup(payTablePopup_Object));
-        SetButton(paytableExit_Button, () => ClosePopup(payTablePopup_Object));
+        SetButton(paytableExit_Button, () => ClosePopup());
         SetButton(Settings_Button, () => OpenPopup(SettingsPopup_Object));
-        SetButton(SettingsExit_Button, () => ClosePopup(SettingsPopup_Object));
+        SetButton(SettingsExit_Button, () => ClosePopup());
         SetButton(MusicOn_Button, ToggleMusic);
         SetButton(MusicOff_Button, ToggleMusic);
         SetButton(SoundOn_Button, ToggleSound);
@@ -147,8 +141,8 @@ public class UIManager : MonoBehaviour
         SetButton(CloseDisconnect_Button, CallOnExitFunction);
         SetButton(Close_Button, CallOnExitFunction);
         SetButton(QuitSplash_button, () => OpenPopup(QuitPopupObject));
-        SetButton(AutoSpinButton,()=>OpenPopup(autoSpinPopupObject));
-        SetButton(AutoSpinPopUpClose,()=>ClosePopup(autoSpinPopupObject));
+        SetButton(AutoSpinButton, () => OpenPopup(autoSpinPopupObject));
+        SetButton(AutoSpinPopUpClose, () => ClosePopup());
         // Initialize other settings
         paytableList[CurrentIndex = 0].SetActive(true);
         isMusic = false;
@@ -170,28 +164,7 @@ public class UIManager : MonoBehaviour
         });
     }
 
-    internal void PopulateWin(int value, double amount)
-    {
-        switch (value)
-        {
-            case 1:
-                if (Win_Image) Win_Image.sprite = BigWin_Sprite;
-                break;
-            case 2:
-                if (Win_Image) Win_Image.sprite = HugeWin_Sprite;
-                break;
-            case 3:
-                if (Win_Image) Win_Image.sprite = MegaWin_Sprite;
-                break;
 
-        }
-
-        if (value == 4)
-            StartPopupAnim(amount, true);
-        else
-            StartPopupAnim(amount, false);
-
-    }
 
     private IEnumerator LoadingRoutine()
     {
@@ -206,21 +179,24 @@ public class UIManager : MonoBehaviour
         StopCoroutine(LoadingTextAnimate());
     }
 
-    internal void InitiateGamble(double currentWinnings){
-        bank.text=currentWinnings.ToString();
-        bet.text=currentWinnings.ToString();
-        potentialWin.text=(currentWinnings*2).ToString();
+    internal void InitiateGamble(double currentWinnings)
+    {
+        bank.text = currentWinnings.ToString();
+        bet.text = currentWinnings.ToString();
+        potentialWin.text = (currentWinnings * 2).ToString();
         // gambleObject.SetActive(true);
     }
 
-    internal void UpdategambleInfo(double currentWinnings,bool half=false){
-        bank.text=currentWinnings.ToString();
-        bet.text=half? (currentWinnings/2).ToString() : currentWinnings.ToString();
-        potentialWin.text=half?currentWinnings.ToString() : (currentWinnings*2).ToString();
+    internal void UpdategambleInfo(double currentWinnings, bool half = false)
+    {
+        bank.text = currentWinnings.ToString("f4");
+        bet.text = half ? (currentWinnings / 2).ToString() : currentWinnings.ToString("f4");
+        potentialWin.text = half ? currentWinnings.ToString() : (currentWinnings * 2).ToString("f4");
 
     }
-    internal void OnCollect(){
-    // gambleObject.SetActive(false);
+    internal void OnCollect()
+    {
+        // gambleObject.SetActive(false);
     }
 
 
@@ -244,51 +220,10 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void StartPopupAnim(double amount, bool jackpot = false)
+
+    internal void UpdateAutoSpinCost(double cost)
     {
-        int initAmount = 0;
-        if (jackpot)
-        {
-            if (jackpot_Object) jackpot_Object.SetActive(true);
-        }
-        else
-        {
-            if (WinPopup_Object) WinPopup_Object.SetActive(true);
-
-        }
-
-        if (MainPopup_Object) MainPopup_Object.SetActive(true);
-
-        DOTween.To(() => initAmount, (val) => initAmount = val, (int)amount, 5f).OnUpdate(() =>
-        {
-            if (jackpot)
-            {
-                if (jackpot_Text) jackpot_Text.text = initAmount.ToString();
-            }
-            else
-            {
-                if (Win_Text) Win_Text.text = initAmount.ToString();
-
-            }
-        });
-
-        DOVirtual.DelayedCall(6f, () =>
-        {
-            if (jackpot)
-            {
-                ClosePopup(jackpot_Object);
-
-            }
-            else
-            {
-                ClosePopup(WinPopup_Object);
-            }
-            slotManager.CheckPopups = false;
-        });
-    }
-
-    internal void UpdateAutoSpinCost(double cost){
-        autoSpinCost.text=cost.ToString();
+        autoSpinCost.text = cost.ToString();
     }
     internal void LowBalPopup()
     {
@@ -310,7 +245,7 @@ public class UIManager : MonoBehaviour
             string text = "";
             for (int j = 0; j < symbols[i].Multiplier.Count; j++)
             {
-                text += $"{6-j}x - {symbols[i].Multiplier[j][0]} \n";
+                text += $"{6 - j}x - {symbols[i].Multiplier[j][0]} \n";
             }
             if (SymbolsText[i]) SymbolsText[i].text = text;
         }
@@ -330,16 +265,18 @@ public class UIManager : MonoBehaviour
         if (audioController) audioController.PlayButtonAudio();
         if (Popup) Popup.SetActive(true);
         if (MainPopup_Object) MainPopup_Object.SetActive(true);
+        currentPopup=Popup;
         paytableList[CurrentIndex = 0].SetActive(true);
     }
 
-    private void ClosePopup(GameObject Popup)
+    internal void ClosePopup()
     {
         if (audioController) audioController.PlayButtonAudio();
-        if (Popup) Popup.SetActive(false);
-        if (!DisconnectPopup_Object.activeSelf)
-        {
+        if(currentPopup.name.ToUpper()!="DISCONNECTIONPOPUP"){
+            currentPopup.SetActive(false);
             if (MainPopup_Object) MainPopup_Object.SetActive(false);
+
+        currentPopup=null;
         }
         paytableList[CurrentIndex].SetActive(false);
     }
@@ -387,6 +324,92 @@ public class UIManager : MonoBehaviour
 
     }
 
+    internal void FreeSpinPopup(int amount)
+    {
+        FreeSpinCount.text = amount.ToString();
+        OpenPopup(FreeSPinPopUpObject);
+
+    }
+
+    internal void CloseFreeSpinPopup()
+    {
+        ClosePopup();
+        FreeSpinCount.text = "0";
+    }
+    internal void EnableWinPopUp(int value)
+    {
+
+        OpenPopup(WinPopup_Object);
+        if (value > 0)
+            specialWinObject.SetActive(true);
+
+        switch (value)
+        {
+            case 0:
+                {
+                    normalWinImage.gameObject.SetActive(true);
+                    normalWinImage.StartAnimation();
+                    break;
+                }
+            case 1:
+                specialWinTitle.text = "BIG WIN";
+                break;
+            case 2:
+                specialWinTitle.text = "HUGE WIN";
+                break;
+            case 3:
+                specialWinTitle.text = "MEGA WIN";
+                break;
+        }
+    }
+
+    internal void DeductBalanceAnim(double finalAmount, double initAmount){
+
+        DOTween.To(() => initAmount, (val) => initAmount = val, finalAmount, 0.8f).OnUpdate(() =>
+        {
+            playerBalance.text = initAmount.ToString("f4");
+
+        }).OnComplete(() =>
+        {
+
+            playerBalance.text = finalAmount.ToString();
+        });
+    }
+
+    internal IEnumerator WinTextAnim(double amount)
+    {
+        double initAmount = 0;
+        DOTween.To(() => initAmount, (val) => initAmount = val, amount, 0.8f).OnUpdate(() =>
+        {
+            Win_Text.text = initAmount.ToString("f5");
+
+        }).OnComplete(() =>
+        {
+
+            Win_Text.text = amount.ToString();
+        });
+        yield return new WaitForSeconds(1.8f);
+        normalWinImage.StopAnimation();
+        if (normalWinImage.gameObject.activeSelf)
+        {
+
+            normalWinImage.gameObject.SetActive(false);
+        }
+        Win_Text.transform.DOLocalMoveY(-411, 0.35f);
+        Win_Text.transform.DOScale(new Vector3(0, 0, 0), 0.4f).OnComplete(() =>
+        {
+            ClosePopup();
+            Win_Text.transform.localScale = Vector3.one;
+            Win_Text.transform.localPosition = Vector3.zero;
+            Win_Text.text = "0";
+
+
+        });
+        yield return new WaitForSeconds(0.5f);
+        specialWinObject.SetActive(false);
+
+
+    }
     internal void DisconnectionPopup()
     {
         if (!isExit)
