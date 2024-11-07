@@ -9,51 +9,55 @@ public class AudioController : MonoBehaviour
     [SerializeField] private AudioSource audioPlayer_wl;
     [SerializeField] private AudioSource audioPlayer_button;
     [SerializeField] private AudioSource audioPlayer_Spin;
+    [SerializeField] private AudioSource reelGlow_Sound;
+
 
     [Header("clips")]
     [SerializeField] private AudioClip SpinButtonClip;
     [SerializeField] private AudioClip SpinClip;
+    [SerializeField] private AudioClip GambleSpinClip;
     [SerializeField] private AudioClip Button;
     [SerializeField] private AudioClip Win_Audio;
+    [SerializeField] private AudioClip GambleWin_Audio;
     [SerializeField] private AudioClip NormalBg_Audio;
+    [SerializeField] private AudioClip FreeSpinBg_Audio;
+    [SerializeField] private AudioClip ReelGlow_audio;
+
 
     private void Awake()
     {
+        reelGlow_Sound.clip=ReelGlow_audio;
         playBgAudio();
+
         //if (bg_adudio) bg_adudio.Play();
         //audioPlayer_button.clip = clips[clips.Length - 1];
     }
 
-    internal void PlayWLAudio(string type)
+    internal void PlayWLAudio(string type = "default")
     {
-
-        switch (type)
+        StopWLAaudio();
+        // audioPlayer_wl.loop=loop;
+        if (type == "gamble")
+            audioPlayer_wl.clip = GambleWin_Audio;
+        else
         {
-
-            case "win":
-                //index = UnityEngine.Random.Range(1, 2);
-                audioPlayer_wl.clip = Win_Audio;
-                break;
-
-                //index = 3;
+            audioPlayer_wl.clip = Win_Audio;
+            audioPlayer_wl.pitch = 1.5f;
 
         }
-        StopWLAaudio();
-        //audioPlayer_wl.clip = clips[index];
-        //audioPlayer_wl.loop = true;
+
         audioPlayer_wl.Play();
 
     }
 
-    internal void PlaySpinAudio()
+    internal void PlaySpinAudio(string type="default")
     {
+        if(type=="gamble")
+        audioPlayer_Spin.clip = GambleSpinClip;
+        else
+        audioPlayer_Spin.clip = SpinClip;
 
-        if (audioPlayer_Spin)
-        {
-            audioPlayer_Spin.clip = SpinClip;
-
-            audioPlayer_Spin.Play();
-        }
+        audioPlayer_Spin.Play();
 
     }
 
@@ -64,43 +68,43 @@ public class AudioController : MonoBehaviour
 
     }
 
-    internal void CheckFocusFunction(bool focus, bool IsSpinning)
+    private void OnApplicationFocus(bool focus)
     {
         if (!focus)
         {
+
             bg_adudio.Pause();
             audioPlayer_wl.Pause();
             audioPlayer_button.Pause();
             audioPlayer_Spin.Pause();
+
         }
         else
         {
-            if (!bg_adudio.mute) bg_adudio.UnPause();
-            if (IsSpinning)
-            {
-                if (!audioPlayer_wl.mute) audioPlayer_wl.UnPause();
-                audioPlayer_Spin.UnPause();
-            }
-            else
-            {
-                StopWLAaudio();
-                audioPlayer_Spin.Stop();
-            }
-            if (!audioPlayer_button.mute) audioPlayer_button.UnPause();
+            bg_adudio.UnPause();
+            audioPlayer_wl.UnPause();
+            audioPlayer_button.UnPause();
+            audioPlayer_Spin.UnPause();
+
 
         }
     }
 
 
 
-    internal void playBgAudio()
+    internal void playBgAudio(string type = "default")
     {
 
 
         //int randomIndex = UnityEngine.Random.Range(0, Bg_Audio.Length);
+        StopBgAudio();
+        bg_adudio.loop = true;
         if (bg_adudio)
         {
-            bg_adudio.clip = NormalBg_Audio;
+            if (type == "FP")
+                bg_adudio.clip = FreeSpinBg_Audio;
+            else
+                bg_adudio.clip = NormalBg_Audio;
 
 
             bg_adudio.Play();
@@ -126,7 +130,18 @@ public class AudioController : MonoBehaviour
     {
         audioPlayer_wl.Stop();
         audioPlayer_wl.loop = false;
+        audioPlayer_wl.pitch = 1f;
+
     }
+
+    internal void ReelGlowSound(bool play){
+        if(play)
+        reelGlow_Sound.Play();
+        else
+        reelGlow_Sound.Stop();
+
+    }
+
 
     internal void StopButtonAudio()
     {
@@ -143,7 +158,8 @@ public class AudioController : MonoBehaviour
     }
 
 
-    internal void ToggleMute(bool toggle, string type = "all")
+
+    internal void ToggleMute(bool toggle, string type)
     {
 
         switch (type)
@@ -159,10 +175,14 @@ public class AudioController : MonoBehaviour
                 audioPlayer_wl.mute = toggle;
                 break;
             case "all":
-                audioPlayer_wl.mute = toggle;
                 bg_adudio.mute = toggle;
                 audioPlayer_button.mute = toggle;
+                audioPlayer_Spin.mute = toggle;
+                audioPlayer_wl.mute = toggle;
                 break;
+
+
+
         }
     }
 

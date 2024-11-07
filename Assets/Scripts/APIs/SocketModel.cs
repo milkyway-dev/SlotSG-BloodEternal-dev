@@ -54,7 +54,6 @@ public class ResultGameData
 [Serializable]
 public class InitGameData
 {
-    public List<List<string>> Reel { get; set; }
     // public List<List<int>> Lines { get; set; }
     public List<double> Bets { get; set; }
     public bool canSwitchLines { get; set; }
@@ -67,7 +66,9 @@ public class InitGameData
 public class UIData
 {
     public List<Symbol> symbols { get; set; }
+        public List<double> BatsMultiplier {get; set;}
 
+    public List<double> wildMultiplier {get; set;}
 }
 
 [Serializable]

@@ -32,7 +32,7 @@ public class SocketController : MonoBehaviour
     [SerializeField]
     private string TestToken;
 
-    protected string gameID = "";
+    protected string gameID = "SL-BE";
 
     internal bool isLoading;
     internal bool SetInit = false;
@@ -159,7 +159,7 @@ public class SocketController : MonoBehaviour
 
     private void AliveRequest()
     {
-        SendDataWithNamespace("YES I AM ALIVE");
+        SendData("YES I AM ALIVE");
     }
 
     void OnConnected(ConnectResponse resp)
@@ -227,7 +227,7 @@ public class SocketController : MonoBehaviour
 
     internal void CloseSocket()
     {
-        SendDataWithNamespace("EXIT");
+        SendData("EXIT");
     }
 
     private void ParseResponse(string jsonObject)
@@ -247,10 +247,14 @@ public class SocketController : MonoBehaviour
             case "InitData":
                 {
                     socketModel.uIData.symbols = message["UIData"]["paylines"]["symbols"].ToObject<List<Symbol>>();
+                    socketModel.uIData.wildMultiplier=gameData["wildMultiplier"].ToObject<List<double>>();
+                    socketModel.uIData.BatsMultiplier=gameData["BatsMultiplier"].ToObject<List<double>>();
                     socketModel.initGameData.Bets = gameData["Bets"].ToObject<List<double>>();
                     socketModel.initGameData.lineData = gameData["Lines"].ToObject<List<List<int>>>();
 
                     OnInit?.Invoke();
+                    Debug.Log("init data" + JsonConvert.SerializeObject(socketModel.initGameData));
+
                     break;
                 }
             case "ResultData":
@@ -304,44 +308,6 @@ public class SocketController : MonoBehaviour
     //     uIManager.InitialiseUIData(initUIData.AbtLogo.link, initUIData.AbtLogo.logoSprite, initUIData.ToULink, initUIData.PopLink, initUIData.paylines);
     // }
 
-
-    internal void AccumulateResult(double currBet)
-    {
-        isResultdone = false;
-        MessageData message = new MessageData();
-        message.data = new BetData();
-        message.data.currentBet = currBet;
-        message.data.spins = 1;
-        message.data.currentLines = 20;
-        message.id = "SPIN";
-        // Serialize message data to JSON
-        string json = JsonUtility.ToJson(message);
-        SendDataWithNamespace("message", json);
-    }
-
-
-    private void SendDataWithNamespace(string eventName, string json = null)
-    {
-        // Send the message
-        if (this.manager.Socket != null && this.manager.Socket.IsOpen)
-        {
-            if (json != null)
-            {
-                this.manager.Socket.Emit(eventName, json);
-                Debug.Log("JSON data sent: " + json);
-            }
-            else
-            {
-                this.manager.Socket.Emit(eventName);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Socket is not connected.");
-        }
-    }
-
-
     internal void SendData(string eventName, object message = null)
     {
 
@@ -362,70 +328,13 @@ public class SocketController : MonoBehaviour
 
     }
 
-    private List<string> RemoveQuotes(List<string> stringList)
-    {
-        for (int i = 0; i < stringList.Count; i++)
-        {
-            stringList[i] = stringList[i].Replace("\"", ""); // Remove inverted commas
-        }
-        return stringList;
-    }
 
-    private List<string> ConvertListListIntToListString(List<List<int>> listOfLists)
-    {
-        List<string> resultList = new List<string>();
 
-        foreach (List<int> innerList in listOfLists)
-        {
-            // Convert each integer in the inner list to string
-            List<string> stringList = new List<string>();
-            foreach (int number in innerList)
-            {
-                stringList.Add(number.ToString());
-            }
 
-            // Join the string representation of integers with ","
-            string joinedString = string.Join(",", stringList.ToArray()).Trim();
-            resultList.Add(joinedString);
-        }
 
-        return resultList;
-    }
 
-    private List<string> ConvertListOfListsToStrings(List<List<string>> inputList)
-    {
-        List<string> outputList = new List<string>();
 
-        foreach (List<string> row in inputList)
-        {
-            string concatenatedString = string.Join(",", row);
-            outputList.Add(concatenatedString);
-        }
 
-        return outputList;
-    }
-
-    private List<string> TransformAndRemoveRecurring(List<List<string>> originalList)
-    {
-        // Flattened list
-        List<string> flattenedList = new List<string>();
-        foreach (List<string> sublist in originalList)
-        {
-            flattenedList.AddRange(sublist);
-        }
-
-        // Remove recurring elements
-        HashSet<string> uniqueElements = new HashSet<string>(flattenedList);
-
-        // Transformed list
-        List<string> transformedList = new List<string>();
-        foreach (string element in uniqueElements)
-        {
-            transformedList.Add(element.Replace(",", ""));
-        }
-
-        return transformedList;
-    }
 }
 
 

@@ -241,7 +241,7 @@ public class SlotController : MonoBehaviour
             }
         }
     }
-    internal IEnumerator StopSpin(float delay1 = 0, float delay2 = 0,bool isFreeSpin=false)
+    internal IEnumerator StopSpin(float delay1 = 0, float delay2 = 0,bool isFreeSpin=false,Action<bool> playReelGlowSound=null)
     {
 
         DeActivateReelBorder();
@@ -250,19 +250,26 @@ public class SlotController : MonoBehaviour
             if (delay1 > 0 && i == 2 && !isFreeSpin)
             {
                 ActivateReelBorder("red");
+                playReelGlowSound?.Invoke(true);
                 yield return new WaitForSeconds(delay1);
             }
 
             if (delay2 > 0 && i == 4 && !isFreeSpin)
             {
+                playReelGlowSound?.Invoke(false);
                 DeActivateReelBorder();
                 ActivateReelBorder("blue");
+                playReelGlowSound?.Invoke(true);
                 yield return new WaitForSeconds(delay2);
             }
 
             StopTweening(Slot_Transform[i], i);
+            playReelGlowSound?.Invoke(false);
+
             yield return new WaitForSeconds(0.25f);
         }
+            playReelGlowSound?.Invoke(false);
+
         KillAllTweens();
         DeActivateReelBorder();
 
@@ -291,7 +298,7 @@ public class SlotController : MonoBehaviour
         {
             for (int j = 0; j < 3; j++)
             {
-                int randomIndex = UnityEngine.Random.Range(0, iconImages.Length-1);
+                int randomIndex = UnityEngine.Random.Range(0, 10);
                 slotMatrix[i].slotImages[j].iconImage.sprite = iconImages[randomIndex];
             }
         }
