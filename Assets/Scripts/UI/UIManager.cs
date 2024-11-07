@@ -46,7 +46,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Settings Popup")]
     [SerializeField] private GameObject SettingsPopup_Object;
-    [SerializeField] private Button Settings_Button;
+    [SerializeField] internal Button Settings_Button;
     [SerializeField] private Button SettingsExit_Button;
     [SerializeField] private Button SoundToggle_button;
     [SerializeField] private Button MusicToggle_button;
@@ -288,7 +288,7 @@ public class UIManager : MonoBehaviour
         if (Popup) Popup.SetActive(true);
         if (MainPopup_Object) MainPopup_Object.SetActive(true);
         currentPopup = Popup;
-        paytableList[CurrentIndex = 0].SetActive(true);
+        // paytableList[CurrentIndex].SetActive(true);
     }
 
     internal void ClosePopup()
@@ -300,7 +300,9 @@ public class UIManager : MonoBehaviour
 
             currentPopup = null;
         }
-        paytableList[CurrentIndex].SetActive(false);
+
+        // CurrentIndex=0;
+        // paytableList[CurrentIndex].SetActive(true);
     }
 
 
@@ -325,23 +327,23 @@ public class UIManager : MonoBehaviour
 
             CurrentIndex--;
         }
-        if (CurrentIndex == paytableList.Length - 1)
-        {
-            RightBtn.interactable = false;
-        }
-        else
-        {
-            RightBtn.interactable = true;
+        // if (CurrentIndex == paytableList.Length - 1)
+        // {
+        //     RightBtn.interactable = false;
+        // }
+        // else
+        // {
+        //     RightBtn.interactable = true;
 
-        }
-        if (CurrentIndex == 0)
-        {
-            LeftBtn.interactable = false;
-        }
-        else
-        {
-            LeftBtn.interactable = true;
-        }
+        // }
+        // if (CurrentIndex == 0)
+        // {
+        //     LeftBtn.interactable = false;
+        // }
+        // else
+        // {
+        //     LeftBtn.interactable = true;
+        // }
 
     }
 

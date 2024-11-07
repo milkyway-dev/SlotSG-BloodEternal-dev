@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Best.SocketIO;
 using Best.SocketIO.Events;
 using Newtonsoft.Json.Linq;
+using DG.Tweening;
 
 
 public class SocketController : MonoBehaviour
@@ -16,7 +17,7 @@ public class SocketController : MonoBehaviour
 
 
     //WebSocket currentSocket = null;
-    [SerializeField]internal bool isResultdone = false;
+    [SerializeField] internal bool isResultdone = false;
 
     private SocketManager manager;
 
@@ -26,6 +27,7 @@ public class SocketController : MonoBehaviour
     //private string SocketURI;
 
     protected string SocketURI = null;
+    // protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
     protected string TestSocketURI = "http://localhost:5000";
     //protected string SocketURI = "http://localhost:5000";
 
@@ -228,6 +230,9 @@ public class SocketController : MonoBehaviour
     internal void CloseSocket()
     {
         SendData("EXIT");
+        Application.ExternalCall("window.parent.postMessage", "onExit", "*");
+
+
     }
 
     private void ParseResponse(string jsonObject)
@@ -239,16 +244,16 @@ public class SocketController : MonoBehaviour
         string id = resp["id"].ToString();
         var message = resp["message"];
         var gameData = message["GameData"];
-        var playerData = message["PlayerData"];
-        if(message["PlayerData"]!=null)
-        socketModel.playerData = message["PlayerData"].ToObject<PlayerData>();
+        // var playerData = message["PlayerData"];
+        if (message["PlayerData"] != null)
+            socketModel.playerData = message["PlayerData"].ToObject<PlayerData>();
         switch (id)
         {
             case "InitData":
                 {
                     socketModel.uIData.symbols = message["UIData"]["paylines"]["symbols"].ToObject<List<Symbol>>();
-                    socketModel.uIData.wildMultiplier=gameData["wildMultiplier"].ToObject<List<double>>();
-                    socketModel.uIData.BatsMultiplier=gameData["BatsMultiplier"].ToObject<List<double>>();
+                    socketModel.uIData.wildMultiplier = gameData["wildMultiplier"].ToObject<List<double>>();
+                    socketModel.uIData.BatsMultiplier = gameData["BatsMultiplier"].ToObject<List<double>>();
                     socketModel.initGameData.Bets = gameData["Bets"].ToObject<List<double>>();
                     socketModel.initGameData.lineData = gameData["Lines"].ToObject<List<List<int>>>();
 
@@ -265,7 +270,7 @@ public class SocketController : MonoBehaviour
                     // myData.message.GameData.FinalsymbolsToEmit = TransformAndRemoveRecurring(myData.message.GameData.symbolsToEmit);
                     // resultData = myData.message.GameData;
                     // playerdata = myData.message.PlayerData;
-                    Debug.Log("result data"+JsonConvert.SerializeObject(socketModel.resultGameData));
+                    Debug.Log("result data" + JsonConvert.SerializeObject(socketModel.resultGameData));
                     isResultdone = true;
                     break;
                 }
@@ -273,7 +278,7 @@ public class SocketController : MonoBehaviour
                 {
                     socketModel.gambleData.currentWinning = message["currentWinning"].ToObject<double>();
                     socketModel.gambleData.playerWon = message["playerWon"].ToObject<bool>();
-                    socketModel.gambleData.coin = message["coin"]!=null? message["coin"].ToObject<string>():"";
+                    socketModel.gambleData.coin = message["coin"] != null ? message["coin"].ToObject<string>() : "";
                     Debug.Log("result" + JsonConvert.SerializeObject(socketModel.gambleData));
                     isResultdone = true;
 
@@ -285,8 +290,6 @@ public class SocketController : MonoBehaviour
                     socketModel.gambleData.balance = message["balance"].ToObject<double>();
                     Debug.Log("collect" + JsonConvert.SerializeObject(socketModel.gambleData));
                     isResultdone = true;
-
-
                     break;
                 }
             case "ExitUser":
@@ -302,6 +305,7 @@ public class SocketController : MonoBehaviour
         }
 
     }
+
 
     // private void RefreshUI()
     // {

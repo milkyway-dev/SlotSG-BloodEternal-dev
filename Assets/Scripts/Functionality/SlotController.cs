@@ -9,72 +9,28 @@ using System;
 
 public class SlotController : MonoBehaviour
 {
-    [SerializeField]
-    private RectTransform mainContainer_RT;
+
 
     [Header("Sprites")]
-    [SerializeField]
-    private Sprite[] iconImages;
+    [SerializeField] private Sprite[] iconImages;
 
     [Header("Slot Images")]
-    [SerializeField]
-    private List<SlotImage> images;
     [SerializeField] private List<SlotImage> slotMatrix;
     [SerializeField] private GlowMatrix[] glowMatrix;
-
+    [SerializeField] private List<SlotIconView> extraIconForAnim;
     [SerializeField] internal GameObject disableIconsPanel;
 
 
     [Header("Slots Transforms")]
     [SerializeField] private Transform[] Slot_Transform;
 
-    [SerializeField] private ImageAnimation secondarySlotPrefab;
-    private Dictionary<int, string> x_string = new Dictionary<int, string>();
-    private Dictionary<int, string> y_string = new Dictionary<int, string>();
 
-    [Header("Buttons")]
-    [SerializeField]
-    private Button SlotStart_Button;
-    [SerializeField]
-    private Button AutoSpin_Button;
-    [SerializeField] private Button AutoSpinStop_Button;
-    [SerializeField] private Button Maxbet_button;
-
-
-
-    [Header("Miscellaneous UI")]
-    [SerializeField] private TMP_Text Balance_text;
-    [SerializeField] private TMP_Text TotalBet_text;
-    [SerializeField] private Button MaxBet_Button;
-    [SerializeField] private Button BetPlus_Button;
-    [SerializeField] private Button BetMinus_Button;
-    [SerializeField] private TMP_Text TotalWin_text;
-    [SerializeField] private TMP_Text BetPerLine_text;
-
-    [SerializeField] private TMP_Text Total_lines;
-
-    [Header("Audio Management")]
-    [SerializeField] private AudioController audioController;
-
-
-    [SerializeField]
-    private AudioSource _audioSource;
-    [SerializeField]
-    private AudioClip _spinSound;
-    [SerializeField]
-    private AudioClip _lossSound;
-    [SerializeField]
-    private AudioClip[] _winSounds;
 
     [Header("tween properties")]
     [SerializeField] private int tweenHeight = 0;
     [SerializeField] private float initialPos;
 
-    [SerializeField]
-    private GameObject Image_Prefab;    //icons prefab
 
-    [SerializeField]
-    private PaylineController PayCalculator;
 
     private List<Tweener> alltweens = new List<Tweener>();
 
@@ -83,136 +39,15 @@ public class SlotController : MonoBehaviour
     [SerializeField]
     private List<ImageAnimation> TempList;  //stores the sprites whose animation is running at present 
 
-    [SerializeField]
-    private int IconSizeFactor = 100;       //set this parameter according to the size of the icon and spacing
-
-    private int numberOfSlots = 5;          //number of columns
-
-
-
-    [SerializeField] private SocketController SocketManager;
-    [SerializeField] private UIManager uiManager;
-
-    private Coroutine AutoSpinRoutine = null;
-    private Coroutine tweenroutine = null;
-    private bool IsAutoSpin = false;
-    private bool IsSpinning = false;
-    private bool CheckSpinAudio = false;
-    [SerializeField]
-    private int spacefactor;
-
-    private int BetCounter = 0;
-    private int LineCounter = 0;
-
-    internal bool CheckPopups;
-    private double currentBalance = 0;
-    private double currentTotalBet = 0;
-
-
     [SerializeField] private ImageAnimation[] VHObjectsBlue;
     [SerializeField] private ImageAnimation[] VHObjectsRed;
 
     [SerializeField] private ImageAnimation[] reel_border;
-
-    // [SerializeField] private ImageAnimation[] slotGlowRed;
-    // [SerializeField] private ImageAnimation[] slotGlowBlue;
     internal List<SlotIconView> animatedIcons = new List<SlotIconView>();
 
-    private void Start()
-    {
-
-        // shuffleInitialMatrix();
-    }
 
 
 
-
-
-    //Fetch Lines from backend
-    internal void FetchLines(string LineVal, int count)
-    {
-        y_string.Add(count + 1, LineVal);
-    }
-
-    //Generate Static Lines from button hovers
-    internal void GenerateStaticLine(TMP_Text LineID_Text)
-    {
-        DestroyStaticLine();
-        int LineID = 1;
-        try
-        {
-            LineID = int.Parse(LineID_Text.text);
-        }
-        catch (Exception e)
-        {
-            Debug.Log("Exception while parsing " + e.Message);
-        }
-        List<int> x_points = null;
-        List<int> y_points = null;
-        x_points = x_string[LineID]?.Split(',')?.Select(Int32.Parse)?.ToList();
-        y_points = y_string[LineID]?.Split(',')?.Select(Int32.Parse)?.ToList();
-        PayCalculator.GeneratePayoutLinesBackend(y_points, y_points.Count, true);
-    }
-
-    //Destroy Static Lines from button hovers
-    internal void DestroyStaticLine()
-    {
-        PayCalculator.ResetStaticLine();
-    }
-
-
-
-    // [x]
-
-
-    private void BalanceDeduction()
-    {
-        double bet = 0;
-        double balance = 0;
-
-        try
-        {
-            bet = double.Parse(TotalBet_text.text);
-        }
-        catch (Exception e)
-        {
-            Debug.Log("Error while conversion " + e.Message);
-        }
-
-        try
-        {
-            balance = double.Parse(Balance_text.text);
-        }
-        catch (Exception e)
-        {
-            Debug.Log("Error while conversion " + e.Message);
-        }
-        double initAmount = balance;
-        balance = balance - (bet);
-
-        DOTween.To(() => initAmount, (val) => initAmount = val, balance, 0.8f).OnUpdate(() =>
-        {
-            if (Balance_text) Balance_text.text = initAmount.ToString("f2");
-        });
-
-    }
-
-    private void WinningsAnim(bool IsStart)
-    {
-        if (IsStart)
-        {
-            WinTween = TotalWin_text.gameObject.GetComponent<RectTransform>().DOScale(new Vector2(1.5f, 1.5f), 1f).SetLoops(-1, LoopType.Yoyo).SetDelay(0);
-        }
-        else
-        {
-            WinTween.Kill();
-            TotalWin_text.gameObject.GetComponent<RectTransform>().localScale = Vector3.one;
-        }
-    }
-
-
-
-    // current
     internal IEnumerator StartSpin()
     {
 
@@ -240,6 +75,11 @@ public class SlotController : MonoBehaviour
 
             }
         }
+        for (int i = 0; i < extraIconForAnim.Count; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, 10);
+            extraIconForAnim[i].iconImage.sprite=iconImages[randomIndex];
+        }
     }
     internal IEnumerator StopSpin(float delay1 = 0, float delay2 = 0,bool isFreeSpin=false,Action<bool> playReelGlowSound=null)
     {
@@ -265,7 +105,7 @@ public class SlotController : MonoBehaviour
 
             StopTweening(Slot_Transform[i], i);
             playReelGlowSound?.Invoke(false);
-
+            
             yield return new WaitForSeconds(0.25f);
         }
             playReelGlowSound?.Invoke(false);
@@ -374,7 +214,7 @@ public class SlotController : MonoBehaviour
 
     }
 
-    internal void ShowWildAndBloodANimation(List<string> iconPos)
+    internal void ShowWildAndBloodANimation(List<string> iconPos,bool turbo)
     {
 
         for (int j = 0; j < iconPos.Count; j++)
@@ -383,9 +223,9 @@ public class SlotController : MonoBehaviour
             SlotIconView tempIcon = slotMatrix[pos[1]].slotImages[pos[0]];
             tempIcon.bloodSplatter.transform.localScale *= 0;
             tempIcon.bloodSplatter.gameObject.SetActive(true);
-            tempIcon.bloodSplatter.transform.DOScale(Vector3.one, 0.5f).OnComplete(()=>{
+            tempIcon.bloodSplatter.transform.DOScale(Vector3.one, turbo?0.3f:0.5f).OnComplete(()=>{
                 tempIcon.wildObject.SetActive(true);
-                tempIcon.wildObject.transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0), 0.3f, 0, 0.3f);
+                tempIcon.wildObject.transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0),turbo?0.2f:0.3f, 0, 0.3f);
             }).SetEase(Ease.OutExpo);
 
             if(!animatedIcons.Contains(tempIcon))
@@ -408,6 +248,8 @@ public class SlotController : MonoBehaviour
                 slotMatrix[i].slotImages[j].transform.localPosition = slotMatrix[i].slotImages[j].defaultPos;
                 slotMatrix[i].slotImages[j].transform.SetSiblingIndex(slotMatrix[i].slotImages[j].siblingIndex);
                 slotMatrix[i].slotImages[j].wildObject.SetActive(false);
+                slotMatrix[i].slotImages[j].bgGlow.gameObject.SetActive(false);
+                slotMatrix[i].slotImages[j].bgGlow.StopAnimation();
             }
         }
 
@@ -492,36 +334,26 @@ public class SlotController : MonoBehaviour
         }
     }
 
-    void EnableIconGlow(int[] pos)
-    {
-        slotMatrix[pos[0]].slotImages[pos[1]].bgGlow.gameObject.SetActive(true);
-        slotMatrix[pos[0]].slotImages[pos[1]].bgGlow.StartAnimation();
+    // void EnableIconGlow(int[] pos)
+    // {
+    //     slotMatrix[pos[0]].slotImages[pos[1]].bgGlow.gameObject.SetActive(true);
+    //     slotMatrix[pos[0]].slotImages[pos[1]].bgGlow.StartAnimation();
 
-    }
+    // }
 
-    internal void DisableGlow()
-    {
-        for (int i = 0; i < glowMatrix.Length; i++)
-        {
-            for (int j = 0; j < glowMatrix[i].row.Count; j++)
-            {
-                slotMatrix[i].slotImages[j].bgGlow.gameObject.SetActive(false);
-                slotMatrix[i].slotImages[j].bgGlow.StopAnimation();
-            }
+    // internal void DisableGlow()
+    // {
+    //     for (int i = 0; i < glowMatrix.Length; i++)
+    //     {
+    //         for (int j = 0; j < glowMatrix[i].row.Count; j++)
+    //         {
+    //             slotMatrix[i].slotImages[j].bgGlow.gameObject.SetActive(false);
+    //             slotMatrix[i].slotImages[j].bgGlow.StopAnimation();
+    //         }
 
-        }
-    }
-    private void StopGameAnimation()
-    {
-        for (int i = 0; i < TempList.Count; i++)
-        {
-            TempList[i].StopAnimation();
-            if (TempList[i].transform.childCount > 0)
-                TempList[i].transform.GetChild(0).gameObject.SetActive(false);
-        }
-        TempList.Clear();
-        TempList.TrimExcess();
-    }
+    //     }
+    // }
+
 
 
     #region TweeningCode
