@@ -405,6 +405,7 @@ public class GameManager : MonoBehaviour
         winIterationCount = maxIterationWinShow;
         while (winIterationCount > 0)
         {
+            if(winIterationCount!=0)
             slotManager.StopIconAnimation();
             if (socketController.socketModel.resultGameData.batPositions.Count > 0)
             {
@@ -415,8 +416,11 @@ public class GameManager : MonoBehaviour
             }
             for (int i = 0; i < symbolsToEmit.Count; i++)
             {
+                if(i!=0){
                 slotManager.StopIconAnimation();
                 yield return new WaitForSeconds(0.1f);
+                }
+
                 slotManager.StartIconAnimation(symbolsToEmit[i]);
                 PayLineCOntroller.GeneratePayline(socketController.socketModel.resultGameData.linesToEmit[i] - 1);
                 yield return new WaitForSeconds(0.8f);

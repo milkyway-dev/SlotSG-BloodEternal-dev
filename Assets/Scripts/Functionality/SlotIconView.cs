@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class SlotIconView : MonoBehaviour
 {
     [Header("required fields")]
+    [SerializeField] internal int pos;
     [SerializeField] internal Image iconImage;
     [SerializeField] internal Transform parent;
     [SerializeField] internal GameObject frontBorder;

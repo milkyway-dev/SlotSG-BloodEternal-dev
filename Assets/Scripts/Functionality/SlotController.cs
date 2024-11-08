@@ -43,9 +43,7 @@ public class SlotController : MonoBehaviour
     [SerializeField] private ImageAnimation[] VHObjectsRed;
 
     [SerializeField] private ImageAnimation[] reel_border;
-    internal List<SlotIconView> animatedIcons = new List<SlotIconView>();
-
-
+    [SerializeField]internal List<SlotIconView> animatedIcons = new List<SlotIconView>();
 
 
     internal IEnumerator StartSpin()
@@ -65,13 +63,13 @@ public class SlotController : MonoBehaviour
         {
             for (int i = 0; i < slotMatrix.Count; i++)
             {
+                
                 slotMatrix[i].slotImages[j].iconImage.sprite = iconImages[resultData[j][i]];
                 if (resultData[j][i] == 11 || resultData[j][i] == 12 || resultData[j][i] == 13 || resultData[j][i] == 14)
                 {
-
+                    
                     slotMatrix[i].slotImages[j].bgGlow.gameObject.SetActive(true);
                     slotMatrix[i].slotImages[j].bgGlow.StartAnimation();
-                    if(!animatedIcons.Contains(slotMatrix[i].slotImages[j]))
                     animatedIcons.Add(slotMatrix[i].slotImages[j]);
                 }
 
@@ -142,6 +140,7 @@ public class SlotController : MonoBehaviour
             {
                 int randomIndex = UnityEngine.Random.Range(0, 10);
                 slotMatrix[i].slotImages[j].iconImage.sprite = iconImages[randomIndex];
+                slotMatrix[i].slotImages[j].pos=(i*10+j);
             }
         }
     }
@@ -167,7 +166,7 @@ public class SlotController : MonoBehaviour
                 tempIcon.frontBorder.SetActive(true);
             });
             tempIcon.transform.SetParent(disableIconsPanel.transform.parent);
-            if (!animatedIcons.Contains(tempIcon))
+            // if (!animatedIcons.Any(icon => icon.id == tempIcon.id))
                 animatedIcons.Add(tempIcon);
         }
 
@@ -183,12 +182,13 @@ public class SlotController : MonoBehaviour
             if (activateFrontBorder)
                 tempIcon.frontBorder.SetActive(true);
             tempIcon.transform.SetParent(disableIconsPanel.transform.parent);
-            if (animatedIcons.Contains(tempIcon))
+            if (!animatedIcons.Any(icon => icon.pos == tempIcon.pos))
                 animatedIcons.Add(tempIcon);
         }
     }
     internal void StopIconBlastAnimation()
     {
+        
 
         foreach (var item in animatedIcons)
         {
@@ -210,7 +210,7 @@ public class SlotController : MonoBehaviour
             tempIcon.frontBorder.SetActive(true);
             tempIcon.transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0), 0.3f, 0, 0.3f);
             tempIcon.transform.SetParent(disableIconsPanel.transform.parent);
-            if (!animatedIcons.Contains(tempIcon))
+            if (!animatedIcons.Any(icon => icon.pos == tempIcon.pos))
                 animatedIcons.Add(tempIcon);
         }
 
@@ -230,8 +230,7 @@ public class SlotController : MonoBehaviour
                 tempIcon.wildObject.SetActive(true);
                 tempIcon.wildObject.transform.DOPunchScale(new Vector3(0.2f, 0.2f, 0), turbo ? 0.2f : 0.3f, 0, 0.3f);
             }).SetEase(Ease.OutExpo);
-
-            if (!animatedIcons.Contains(tempIcon))
+            if (!animatedIcons.Any(icon => icon.pos == tempIcon.pos))
                 animatedIcons.Add(tempIcon);
         }
 
