@@ -44,7 +44,6 @@ public class SocketController : MonoBehaviour
     internal Action OnInit;
     internal Action ShowDisconnectionPopup;
 
-    private bool initiated;
     private void Awake()
     {
         isLoading = true;
