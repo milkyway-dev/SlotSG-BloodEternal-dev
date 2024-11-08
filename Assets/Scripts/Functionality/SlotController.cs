@@ -166,7 +166,7 @@ public class SlotController : MonoBehaviour
                 tempIcon.frontBorder.SetActive(true);
             });
             tempIcon.transform.SetParent(disableIconsPanel.transform.parent);
-            // if (!animatedIcons.Any(icon => icon.id == tempIcon.id))
+            if (!animatedIcons.Any(icon => icon.pos == tempIcon.pos))
                 animatedIcons.Add(tempIcon);
         }
 

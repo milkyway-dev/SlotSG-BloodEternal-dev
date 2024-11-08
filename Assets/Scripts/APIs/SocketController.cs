@@ -34,7 +34,7 @@ public class SocketController : MonoBehaviour
     [SerializeField]
     private string TestToken;
 
-    protected string gameID = "SL-BE";
+    protected string gameID = "";
 
     internal bool isLoading;
     internal bool SetInit = false;
