@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Button Maxbet_button;
     [SerializeField] private Button BetMinus_Button;
     [SerializeField] private Button BetPlus_Button;
+    [SerializeField] private Button ToatlBetMinus_Button;
+    [SerializeField] private Button TotalBetPlus_Button;
     [SerializeField] private TMP_Text betPerLine_text;
     [SerializeField] private TMP_Text totalBet_text;
     [SerializeField] private bool isSpinning;
@@ -33,7 +35,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_Dropdown autoSpinDropDown;
     [SerializeField] TMP_Dropdown betPerLineDropDown;
     [SerializeField] private bool isAutoSpin;
-    [SerializeField] private int autoCounter = 0;
     [SerializeField] private int autoSpinCounter;
     [SerializeField] private TMP_Text autoSpinText;
     List<int> autoOptions = new List<int>() { 15, 20, 25, 30, 40, 100 };
@@ -86,6 +87,8 @@ public class GameManager : MonoBehaviour
         SetButton(AutoSpinStop_Button, () => StartCoroutine(StopAutoSpinCoroutine()));
         SetButton(BetPlus_Button, () => OnBetChange(true));
         SetButton(BetMinus_Button, () => OnBetChange(false));
+        SetButton(ToatlBetMinus_Button,()=>OnBetChange(false));
+        SetButton(TotalBetPlus_Button,()=>OnBetChange(true));
         SetButton(Maxbet_button, MaxBet);
         SetButton(Double_Button, OnInitGamble);
         SetButton(Head_option, () => StartCoroutine(OnSelectGamble("HEAD")));
@@ -194,7 +197,7 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator AutoSpinRoutine()
     {
-        int noOfSPin = autoOptions[autoCounter];
+        int noOfSPin = autoOptions[autoSpinCounter];
         while (noOfSPin > 0 && isAutoSpin)
         {
             noOfSPin--;
@@ -209,18 +212,20 @@ public class GameManager : MonoBehaviour
         }
         autoSpinText.transform.parent.gameObject.SetActive(false);
         autoSpinText.text = "0";
-        isAutoSpin = false;
         isSpinning = false;
-        ToggleButtonGrp(true);
+        StartCoroutine(StopAutoSpinCoroutine());
         yield return null;
     }
 
-    private IEnumerator StopAutoSpinCoroutine()
+    private IEnumerator StopAutoSpinCoroutine(bool hard=false)
     {
+        Debug.Log("stop autospin called");
         isAutoSpin = false;
         AutoSpin_Button.gameObject.SetActive(true);
         AutoSpinStop_Button.gameObject.SetActive(false);
+        if(!hard)
         yield return new WaitUntil(() => !isSpinning);
+
         if (autoSpinRoutine != null)
         {
             StopCoroutine(autoSpinRoutine);
@@ -228,7 +233,10 @@ public class GameManager : MonoBehaviour
             autoSpinText.transform.parent.gameObject.SetActive(false);
             autoSpinText.text = "0";
         }
+        AutoSpinPopup_Button.gameObject.SetActive(true);
+        if(!hard)
         ToggleButtonGrp(true);
+        autoSpinText.text="0";
         yield return null;
 
     }
@@ -239,8 +247,9 @@ public class GameManager : MonoBehaviour
         {
 
             isSpinning = false;
-            if (isAutoSpin)
-                StopAutoSpinCoroutine();
+            if (isAutoSpin){
+                  StartCoroutine(StopAutoSpinCoroutine());
+            }
 
             ToggleButtonGrp(true);
             yield break;
@@ -258,7 +267,7 @@ public class GameManager : MonoBehaviour
             if (freeSpinRoutine != null)
                 StopCoroutine(freeSpinRoutine);
             if (autoSpinRoutine != null)
-                StopCoroutine(autoSpinRoutine);
+                StartCoroutine(StopAutoSpinCoroutine(true));
             isFreeSpin = true;
             isAutoSpin = false;
             yield return InitiateFreeSpin(socketController.socketModel.resultGameData.vampHuman);
@@ -282,7 +291,8 @@ public class GameManager : MonoBehaviour
 
         isSpinning = true;
         winIterationCount = 0;
-        slotManager.StopIconAnimation();
+        slotManager.OnlyChangeParent();
+        // slotManager.StopIconAnimation();
         PayLineCOntroller.ResetLines(true);
         if (iterativeRoutine != null)
             StopCoroutine(iterativeRoutine);
@@ -306,6 +316,7 @@ public class GameManager : MonoBehaviour
     IEnumerator OnSpin()
     {
         yield return slotManager.StartSpin();
+        slotManager.StopIconAnimation();
         if (audioController) audioController.PlaySpinAudio();
         yield return new WaitUntil(() => socketController.isResultdone);
         slotManager.PopulateSLotMatrix(socketController.socketModel.resultGameData.ResultReel);
@@ -446,13 +457,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator InitiateFreeSpin(List<string> VHPos)
     {
-        if (isAutoSpin)
-        {
-            isAutoSpin = false;
-            StopCoroutine(autoSpinRoutine);
-            autoSpinCounter = 0;
 
-        }
         freeSpinCount = socketController.socketModel.resultGameData.count;
         slotManager.disableIconsPanel.SetActive(false);
         slotManager.IconShakeAnim(VHPos);
@@ -479,7 +484,7 @@ public class GameManager : MonoBehaviour
     {
         if (isAutoSpin)
         {
-            StopAutoSpinCoroutine();
+            StartCoroutine(StopAutoSpinCoroutine());
         }
         if (iterativeRoutine != null)
             StopCoroutine(iterativeRoutine);
@@ -623,6 +628,8 @@ public class GameManager : MonoBehaviour
         if (BetMinus_Button) BetMinus_Button.interactable = toggle;
         if (BetPlus_Button) BetPlus_Button.interactable = toggle;
         if (AutoSpinPopup_Button) AutoSpinPopup_Button.interactable = toggle;
+        if(ToatlBetMinus_Button) ToatlBetMinus_Button.interactable=toggle;
+        if(TotalBetPlus_Button) TotalBetPlus_Button.interactable=toggle;
         uIManager.Settings_Button.interactable = toggle;
     }
 
