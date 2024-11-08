@@ -1103,7 +1103,6 @@ RectTransform:
   - {fileID: 1112840943}
   - {fileID: 1140710084}
   - {fileID: 1643718613}
-  - {fileID: 712105281}
   - {fileID: 1485219722}
   - {fileID: 1400024506}
   m_Father: {fileID: 0}
@@ -3416,7 +3415,6 @@ GameObject:
   - component: {fileID: 175694442}
   - component: {fileID: 175694441}
   - component: {fileID: 175694440}
-  - component: {fileID: 175694443}
   m_Layer: 5
   m_Name: Exit_Button
   m_TagString: Untagged
@@ -3463,7 +3461,7 @@ MonoBehaviour:
     m_SelectOnDown: {fileID: 0}
     m_SelectOnLeft: {fileID: 0}
     m_SelectOnRight: {fileID: 0}
-  m_Transition: 3
+  m_Transition: 1
   m_Colors:
     m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -3526,27 +3524,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 175694438}
   m_CullTransparentMesh: 1
---- !u!95 &175694443
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 175694438}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 003a3428d38154b4193eb5a9eddea7ec, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &177164869
 GameObject:
   m_ObjectHideFlags: 0
@@ -8521,7 +8498,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: 'IF THE SECOND VAMPIRE / HUMAN pair lands next to each other DURING FREE
-    SPINS THEN A FURTHER 8 FREE: SPINS ARe AWARDEN.'
+    SPINS THEN A FURTHER  8 FREE: SPINS ARe AWARDED'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7755e0e4d86374595837082012f927ca, type: 2}
   m_sharedMaterial: {fileID: 3328470924528299338, guid: 7755e0e4d86374595837082012f927ca, type: 2}
@@ -8554,7 +8531,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 17
   m_HorizontalAlignment: 8
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -13387,7 +13364,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: EACH VAMPIRE / HUMAN PAIR WILL GENERATE I TO 4 WILDS EVERY FREE SPIN.
+  m_text: EACH VAMPIRE / HUMAN PAIR WILL GENERATE WILDS EVERY FREE SPIN.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7755e0e4d86374595837082012f927ca, type: 2}
   m_sharedMaterial: {fileID: 3328470924528299338, guid: 7755e0e4d86374595837082012f927ca, type: 2}
@@ -13421,7 +13398,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 16
+  m_HorizontalAlignment: 8
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -14563,7 +14540,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -54, y: -116}
+  m_AnchoredPosition: {x: 0, y: -116}
   m_SizeDelta: {x: 200, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &657710936
@@ -15603,7 +15580,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 704341214}
-  m_Father: {fileID: 51930704}
+  m_Father: {fileID: 1480051154}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -18087,7 +18064,6 @@ MonoBehaviour:
   autoSpinDropDown: {fileID: 1204501305}
   betPerLineDropDown: {fileID: 1287451383}
   isAutoSpin: 0
-  autoCounter: 0
   autoSpinCounter: 0
   autoSpinText: {fileID: 1313104393}
   Double_Button: {fileID: 133709855}
@@ -32618,6 +32594,7 @@ RectTransform:
   - {fileID: 980762769}
   - {fileID: 780772659}
   - {fileID: 742977645}
+  - {fileID: 712105281}
   m_Father: {fileID: 51930704}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

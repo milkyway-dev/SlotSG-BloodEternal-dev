@@ -265,7 +265,7 @@ public class UIManager : MonoBehaviour
         {
             if (uIData.BatsMultiplier[i] == 0)
                 continue;
-            multiplierRow += $"X{uIData.BatsMultiplier.Count - 1 - i}\t";
+            multiplierRow += $"X{uIData.BatsMultiplier.Count - i}\t";
             valueRow += $"{uIData.BatsMultiplier[i]}\t";
         }
 
@@ -285,6 +285,9 @@ public class UIManager : MonoBehaviour
 
     private void OpenPopup(GameObject Popup)
     {
+        if(currentPopup!=null && !DisconnectPopup_Object.activeSelf){
+            ClosePopup();
+        }
         if (Popup) Popup.SetActive(true);
         if (MainPopup_Object) MainPopup_Object.SetActive(true);
         currentPopup = Popup;
@@ -295,10 +298,13 @@ public class UIManager : MonoBehaviour
     {
         if (!DisconnectPopup_Object.activeSelf)
         {
+            if(currentPopup!=null){
             currentPopup.SetActive(false);
             if (MainPopup_Object) MainPopup_Object.SetActive(false);
 
             currentPopup = null;
+            }
+
         }
 
         // CurrentIndex=0;

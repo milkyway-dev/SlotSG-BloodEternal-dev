@@ -76,6 +76,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private bool turboMode;
     [SerializeField] private Button Turbo_button;
+
+    private bool initiated;
+
     void Start()
     {
         SetButton(SlotStart_Button, ExecuteSpin, true);
@@ -87,8 +90,8 @@ public class GameManager : MonoBehaviour
         SetButton(AutoSpinStop_Button, () => StartCoroutine(StopAutoSpinCoroutine()));
         SetButton(BetPlus_Button, () => OnBetChange(true));
         SetButton(BetMinus_Button, () => OnBetChange(false));
-        SetButton(ToatlBetMinus_Button,()=>OnBetChange(false));
-        SetButton(TotalBetPlus_Button,()=>OnBetChange(true));
+        SetButton(ToatlBetMinus_Button, () => OnBetChange(false));
+        SetButton(TotalBetPlus_Button, () => OnBetChange(true));
         SetButton(Maxbet_button, MaxBet);
         SetButton(Double_Button, OnInitGamble);
         SetButton(Head_option, () => StartCoroutine(OnSelectGamble("HEAD")));
@@ -107,11 +110,11 @@ public class GameManager : MonoBehaviour
         betPerLineDropDown.onValueChanged.AddListener((int index) =>
         {
             betCounter = index;
-            betPerLine_text.text=socketController.socketModel.initGameData.Bets[betCounter].ToString();
+            betPerLine_text.text = socketController.socketModel.initGameData.Bets[betCounter].ToString();
             CalculateCost();
         });
 
-        SetButton(Turbo_button,ToggleTurbo);
+        SetButton(Turbo_button, ToggleTurbo);
 
         slotManager.shuffleInitialMatrix();
         socketController.OnInit = InitGame;
@@ -142,19 +145,29 @@ public class GameManager : MonoBehaviour
     }
     void InitGame()
     {
+        if (!initiated)
+        {
+            initiated = true;
+            betCounter = 0;
+            currentTotalBet = socketController.socketModel.initGameData.Bets[betCounter] * socketController.socketModel.initGameData.lineData.Count;
 
-        betCounter = 0;
-        currentTotalBet = socketController.socketModel.initGameData.Bets[betCounter] * socketController.socketModel.initGameData.lineData.Count;
+            if (totalBet_text) totalBet_text.text = currentTotalBet.ToString();
+            if (betPerLine_text) betPerLine_text.text = socketController.socketModel.initGameData.Bets[betCounter].ToString();
+            PayLineCOntroller.paylines = socketController.socketModel.initGameData.lineData;
+            uIManager.UpdatePlayerInfo(socketController.socketModel.playerData);
+            uIManager.PopulateSymbolsPayout(socketController.socketModel.uIData);
+            PopulateAutoSpinDropDown();
+            PopulateBetPerlineDropDown();
+            CalculateCost();
+            Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
+        }
+        else
+        {
+            uIManager.PopulateSymbolsPayout(socketController.socketModel.uIData);
+            PopulateAutoSpinDropDown();
+            PopulateBetPerlineDropDown();
+        }
 
-        if (totalBet_text) totalBet_text.text = currentTotalBet.ToString();
-        if (betPerLine_text) betPerLine_text.text = socketController.socketModel.initGameData.Bets[betCounter].ToString();
-        PayLineCOntroller.paylines = socketController.socketModel.initGameData.lineData;
-        uIManager.UpdatePlayerInfo(socketController.socketModel.playerData);
-        uIManager.PopulateSymbolsPayout(socketController.socketModel.uIData);
-        PopulateAutoSpinDropDown();
-        PopulateBetPerlineDropDown();
-        CalculateCost();
-        Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
 
     }
 
@@ -217,14 +230,14 @@ public class GameManager : MonoBehaviour
         yield return null;
     }
 
-    private IEnumerator StopAutoSpinCoroutine(bool hard=false)
+    private IEnumerator StopAutoSpinCoroutine(bool hard = false)
     {
         Debug.Log("stop autospin called");
         isAutoSpin = false;
         AutoSpin_Button.gameObject.SetActive(true);
         AutoSpinStop_Button.gameObject.SetActive(false);
-        if(!hard)
-        yield return new WaitUntil(() => !isSpinning);
+        if (!hard)
+            yield return new WaitUntil(() => !isSpinning);
 
         if (autoSpinRoutine != null)
         {
@@ -234,9 +247,9 @@ public class GameManager : MonoBehaviour
             autoSpinText.text = "0";
         }
         AutoSpinPopup_Button.gameObject.SetActive(true);
-        if(!hard)
-        ToggleButtonGrp(true);
-        autoSpinText.text="0";
+        if (!hard)
+            ToggleButtonGrp(true);
+        autoSpinText.text = "0";
         yield return null;
 
     }
@@ -247,8 +260,9 @@ public class GameManager : MonoBehaviour
         {
 
             isSpinning = false;
-            if (isAutoSpin){
-                  StartCoroutine(StopAutoSpinCoroutine());
+            if (isAutoSpin)
+            {
+                StartCoroutine(StopAutoSpinCoroutine());
             }
 
             ToggleButtonGrp(true);
@@ -308,7 +322,7 @@ public class GameManager : MonoBehaviour
             gameStateText.text = $"Free Spins Remaining: {freeSpinCount}";
         else
             gameStateText.text = $"Press Spin to Play";
-
+        uIManager.ClosePopup();
         return true;
 
     }
@@ -416,8 +430,8 @@ public class GameManager : MonoBehaviour
         winIterationCount = maxIterationWinShow;
         while (winIterationCount > 0)
         {
-            if(winIterationCount!=0)
-            slotManager.StopIconAnimation();
+            if (winIterationCount != 0)
+                slotManager.StopIconAnimation();
             if (socketController.socketModel.resultGameData.batPositions.Count > 0)
             {
                 slotManager.ShowOnlyIcons(socketController.socketModel.resultGameData.batPositions, true);
@@ -427,9 +441,10 @@ public class GameManager : MonoBehaviour
             }
             for (int i = 0; i < symbolsToEmit.Count; i++)
             {
-                if(i!=0){
-                slotManager.StopIconAnimation();
-                yield return new WaitForSeconds(0.1f);
+                if (i != 0)
+                {
+                    slotManager.StopIconAnimation();
+                    yield return new WaitForSeconds(0.1f);
                 }
 
                 slotManager.StartIconAnimation(symbolsToEmit[i]);
@@ -514,7 +529,6 @@ public class GameManager : MonoBehaviour
         {
             yield return new WaitForSeconds(1f);
         }
-
         if (socketController.socketModel.gambleData.coin == "HEAD")
         {
             coinAnim.textureArray.RemoveAt(0);
@@ -574,6 +588,7 @@ public class GameManager : MonoBehaviour
         object gambleResData = new { data = new { }, id = "GAMBLECOLLECT" };
         socketController.SendData("message", gambleResData);
         yield return new WaitUntil(() => socketController.isResultdone);
+        currentBalance = socketController.socketModel.gambleData.balance;
         PlayerData playerData = new PlayerData();
         playerData.currentWining = socketController.socketModel.gambleData.currentWinning;
         playerData.Balance = socketController.socketModel.gambleData.balance;
@@ -628,8 +643,8 @@ public class GameManager : MonoBehaviour
         if (BetMinus_Button) BetMinus_Button.interactable = toggle;
         if (BetPlus_Button) BetPlus_Button.interactable = toggle;
         if (AutoSpinPopup_Button) AutoSpinPopup_Button.interactable = toggle;
-        if(ToatlBetMinus_Button) ToatlBetMinus_Button.interactable=toggle;
-        if(TotalBetPlus_Button) TotalBetPlus_Button.interactable=toggle;
+        if (ToatlBetMinus_Button) ToatlBetMinus_Button.interactable = toggle;
+        if (TotalBetPlus_Button) TotalBetPlus_Button.interactable = toggle;
         uIManager.Settings_Button.interactable = toggle;
     }
 

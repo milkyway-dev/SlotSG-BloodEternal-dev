@@ -43,6 +43,8 @@ public class SocketController : MonoBehaviour
 
     internal Action OnInit;
     internal Action ShowDisconnectionPopup;
+
+    private bool initiated;
     private void Awake()
     {
         isLoading = true;
@@ -256,7 +258,7 @@ public class SocketController : MonoBehaviour
                     socketModel.uIData.BatsMultiplier = gameData["BatsMultiplier"].ToObject<List<double>>();
                     socketModel.initGameData.Bets = gameData["Bets"].ToObject<List<double>>();
                     socketModel.initGameData.lineData = gameData["Lines"].ToObject<List<List<int>>>();
-
+                    // socketModel.initGameData.freeSpinCount=gameData["freeSpinIncrementCount"].ToObject<double>();
                     OnInit?.Invoke();
                     Debug.Log("init data" + JsonConvert.SerializeObject(socketModel.initGameData));
 

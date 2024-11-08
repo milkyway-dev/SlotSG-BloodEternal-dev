@@ -59,6 +59,7 @@ public class InitGameData
     public bool canSwitchLines { get; set; }
     public List<int> LinesCount { get; set; }
     public List<List<int>> lineData {get; set;}
+    public double freeSpinCount{get; set;}
 }
 
 
