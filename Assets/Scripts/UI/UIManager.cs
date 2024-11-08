@@ -202,7 +202,7 @@ public class UIManager : MonoBehaviour
     internal void UpdatePlayerInfo(PlayerData playerData)
     {
         playerCurrentWinning.text = playerData.currentWining.ToString();
-        playerBalance.text = playerData.Balance.ToString();
+        playerBalance.text = playerData.Balance.ToString("f4");
 
     }
 

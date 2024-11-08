@@ -104,6 +104,7 @@ public class GameManager : MonoBehaviour
         betPerLineDropDown.onValueChanged.AddListener((int index) =>
         {
             betCounter = index;
+            betPerLine_text.text=socketController.socketModel.initGameData.Bets[betCounter].ToString();
             CalculateCost();
         });
 
@@ -457,7 +458,7 @@ public class GameManager : MonoBehaviour
         slotManager.FreeSpinVHAnim(VHPos, ref VHcomboList);
         yield return new WaitForSeconds(1f);
         uIManager.FreeSpinPopup(freeSpinCount);
-        yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(1.5f);
         uIManager.CloseFreeSpinPopup();
     }
 
