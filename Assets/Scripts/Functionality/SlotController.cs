@@ -45,6 +45,7 @@ public class SlotController : MonoBehaviour
     [SerializeField] private ImageAnimation[] reel_border;
     [SerializeField] internal List<SlotIconView> animatedIcons = new List<SlotIconView>();
 
+    [SerializeField] internal List<List<int>> freezeIndex=new List<List<int>>();
 
     internal IEnumerator StartSpin()
     {
@@ -59,6 +60,7 @@ public class SlotController : MonoBehaviour
 
     internal void PopulateSLotMatrix(List<List<int>> resultData)
     {
+
         for (int j = 0; j < slotMatrix[0].slotImages.Count; j++)
         {
             for (int i = 0; i < slotMatrix.Count; i++)
@@ -67,7 +69,6 @@ public class SlotController : MonoBehaviour
                 slotMatrix[i].slotImages[j].iconImage.sprite = iconImages[resultData[j][i]];
                 if (resultData[j][i] == 11 || resultData[j][i] == 12 || resultData[j][i] == 13 || resultData[j][i] == 14)
                 {
-
                     slotMatrix[i].slotImages[j].bgGlow.gameObject.SetActive(true);
                     slotMatrix[i].slotImages[j].bgGlow.StartAnimation();
                     animatedIcons.Add(slotMatrix[i].slotImages[j]);
