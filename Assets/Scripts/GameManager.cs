@@ -150,7 +150,7 @@ public class GameManager : MonoBehaviour
             initiated = true;
             betCounter = 0;
             currentTotalBet = socketController.socketModel.initGameData.Bets[betCounter] * socketController.socketModel.initGameData.lineData.Count;
-
+            currentBalance=socketController.socketModel.playerData.Balance;
             if (totalBet_text) totalBet_text.text = currentTotalBet.ToString();
             if (betPerLine_text) betPerLine_text.text = socketController.socketModel.initGameData.Bets[betCounter].ToString();
             PayLineCOntroller.paylines = socketController.socketModel.initGameData.lineData;
@@ -324,7 +324,7 @@ public class GameManager : MonoBehaviour
             gameStateText.text = $"Press Spin to Play";
         uIManager.ClosePopup();
         return true;
-        
+
 
     }
 
