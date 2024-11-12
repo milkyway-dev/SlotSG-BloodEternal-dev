@@ -18158,7 +18158,7 @@ MonoBehaviour:
   tailImage: {fileID: 21300000, guid: 0897e113039904b55b62d7ad83f24862, type: 3}
   isFreeSpin: 0
   freeSpinStarted: 0
-  currentBalance: 9999999
+  currentBalance: 0
   currentTotalBet: 0
   betCounter: 0
   wildPosition: 0
