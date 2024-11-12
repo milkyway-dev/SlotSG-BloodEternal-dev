@@ -331,6 +331,7 @@ public class GameManager : MonoBehaviour
     IEnumerator OnSpin()
     {
         yield return slotManager.StartSpin();
+        gameStateText.text = "";
         slotManager.StopIconAnimation();
         if (audioController) audioController.PlaySpinAudio();
         yield return new WaitUntil(() => socketController.isResultdone);
