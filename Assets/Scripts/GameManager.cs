@@ -341,11 +341,11 @@ public class GameManager : MonoBehaviour
         if (!turboMode)
         {
             delay = slotManager.CalculateDelay(socketController.socketModel.resultGameData.ResultReel);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(2f);
         }
         else
         {
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(1f);
 
         }
         yield return slotManager.StopSpin(delay[0], delay[1], isFreeSpin, audioController.ReelGlowSound);
