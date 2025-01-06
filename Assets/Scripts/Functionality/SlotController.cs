@@ -45,16 +45,20 @@ public class SlotController : MonoBehaviour
     [SerializeField] private ImageAnimation[] reel_border;
     [SerializeField] internal List<SlotIconView> animatedIcons = new List<SlotIconView>();
 
-    [SerializeField] internal List<List<int>> freezeIndex=new List<List<int>>();
+    [SerializeField] internal List<List<int>> freezeIndex = new List<List<int>>();
 
-    internal IEnumerator StartSpin()
+    internal IEnumerator StartSpin(bool turboMode)
     {
 
         for (int i = 0; i < Slot_Transform.Length; i++)
         {
-            InitializeTweening(Slot_Transform[i]);
+            InitializeTweening(Slot_Transform[i], turboMode);
+            if(!GameManager.immediateStop)
             yield return new WaitForSeconds(0.1f);
         }
+        if(GameManager.immediateStop)
+            yield return new WaitForSeconds(0.35f);
+
 
     }
 
@@ -82,20 +86,21 @@ public class SlotController : MonoBehaviour
             extraIconForAnim[i].iconImage.sprite = iconImages[randomIndex];
         }
     }
-    internal IEnumerator StopSpin(float delay1 = 0, float delay2 = 0, bool isFreeSpin = false, Action<bool> playReelGlowSound = null)
+    internal IEnumerator StopSpin(float delay1 = 0, float delay2 = 0, bool isFreeSpin = false, bool turboMode = false, Action<bool> playReelGlowSound = null)
     {
 
         DeActivateReelBorder();
         for (int i = 0; i < Slot_Transform.Length; i++)
         {
-            if (delay1 > 0 && i == 2 && !isFreeSpin)
+
+            if (delay1 > 0 && i == 2 && !isFreeSpin && !GameManager.immediateStop)
             {
                 ActivateReelBorder("red");
                 playReelGlowSound?.Invoke(true);
                 yield return new WaitForSeconds(delay1);
             }
 
-            if (delay2 > 0 && i == 4 && !isFreeSpin)
+            if (delay2 > 0 && i == 4 && !isFreeSpin && !GameManager.immediateStop)
             {
                 playReelGlowSound?.Invoke(false);
                 DeActivateReelBorder();
@@ -104,12 +109,21 @@ public class SlotController : MonoBehaviour
                 yield return new WaitForSeconds(delay2);
             }
 
-            StopTweening(Slot_Transform[i], i);
+            StopTweening(Slot_Transform[i], i, turboMode, GameManager.immediateStop);
             playReelGlowSound?.Invoke(false);
 
-            yield return new WaitForSeconds(0.25f);
+            if (!GameManager.immediateStop)
+            {
+                if (turboMode)
+                    yield return new WaitForSeconds(0.125f);
+                else
+                    yield return new WaitForSeconds(0.25f);
+            }
         }
-        playReelGlowSound?.Invoke(false);
+        if (GameManager.immediateStop)
+            yield return new WaitForSeconds(0.25f);
+
+        // playReelGlowSound?.Invoke(false);
 
         KillAllTweens();
         DeActivateReelBorder();
@@ -250,22 +264,6 @@ public class SlotController : MonoBehaviour
     internal void StopIconAnimation()
     {
 
-        // for (int i = 0; i < slotMatrix.Count; i++)
-        // {
-        //     for (int j = 0; j < slotMatrix[i].slotImages.Count; j++)
-        //     {
-        //         slotMatrix[i].slotImages[j].bloodSplatter.gameObject.SetActive(false);
-        //         slotMatrix[i].slotImages[j].transform.localScale = Vector3.one;
-        //         slotMatrix[i].slotImages[j].frontBorder.SetActive(false);
-        //         slotMatrix[i].slotImages[j].transform.SetParent(slotMatrix[i].slotImages[j].parent);
-        //         slotMatrix[i].slotImages[j].transform.localPosition = slotMatrix[i].slotImages[j].defaultPos;
-        //         slotMatrix[i].slotImages[j].transform.SetSiblingIndex(slotMatrix[i].slotImages[j].siblingIndex);
-        //         slotMatrix[i].slotImages[j].wildObject.SetActive(false);
-        //         slotMatrix[i].slotImages[j].bgGlow.gameObject.SetActive(false);
-        //         slotMatrix[i].slotImages[j].bgGlow.StopAnimation();
-        //     }
-        // }
-
         foreach (var item in animatedIcons)
         {
             item.frontBorder.SetActive(false);
@@ -349,50 +347,35 @@ public class SlotController : MonoBehaviour
         }
     }
 
-    // void EnableIconGlow(int[] pos)
-    // {
-    //     slotMatrix[pos[0]].slotImages[pos[1]].bgGlow.gameObject.SetActive(true);
-    //     slotMatrix[pos[0]].slotImages[pos[1]].bgGlow.StartAnimation();
-
-    // }
-
-    // internal void DisableGlow()
-    // {
-    //     for (int i = 0; i < glowMatrix.Length; i++)
-    //     {
-    //         for (int j = 0; j < glowMatrix[i].row.Count; j++)
-    //         {
-    //             slotMatrix[i].slotImages[j].bgGlow.gameObject.SetActive(false);
-    //             slotMatrix[i].slotImages[j].bgGlow.StopAnimation();
-    //         }
-
-    //     }
-    // }
-
-
-
-    #region TweeningCode
-    private void InitializeTweening(Transform slotTransform)
+    private void InitializeTweening(Transform slotTransform, bool turboMode)
     {
-        // slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
         Tweener tweener = null;
-        tweener = slotTransform.DOLocalMoveY(-tweenHeight + 350, 0.35f).SetEase(Ease.InBack).OnComplete(() =>
+        float delay = 0.3f;
+        if (turboMode)
+            delay /= 2;
+        tweener = slotTransform.DOLocalMoveY(-tweenHeight + 350, delay).SetEase(Ease.InBack).OnComplete(() =>
         {
-            tweener.Pause();
-            slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, -835f);
+            // tweener.Pause();
             tweener.Kill();
-            tweener = slotTransform.DOLocalMoveY(-tweenHeight + 350, 0.2f).SetLoops(-1, LoopType.Restart).SetDelay(0);
+            slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, -835f);
+            tweener = slotTransform.DOLocalMoveY(-tweenHeight + 350, delay).SetLoops(-1, LoopType.Restart).SetDelay(0).SetEase(Ease.Linear);
             alltweens.Add(tweener);
 
         });
         // tweener.Play();
     }
 
-    private void StopTweening(Transform slotTransform, int index)
+    private void StopTweening(Transform slotTransform, int index, bool turboMode, bool immediateStop)
     {
-        alltweens[index].Pause();
+        float delay = 0.25f;
+        if (turboMode)
+            delay /= 2;
+        if (immediateStop)
+            delay = 0;
+
+        alltweens[index]?.Pause();
         slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, initialPos + 500);
-        alltweens[index] = slotTransform.DOLocalMoveY(initialPos, 0.25f).SetEase(Ease.OutQuad); // slot initial pos - iconsizefactor - spacing
+        alltweens[index] = slotTransform.DOLocalMoveY(initialPos, delay).SetEase(Ease.OutQuad);
 
     }
 
@@ -406,7 +389,6 @@ public class SlotController : MonoBehaviour
         alltweens.Clear();
 
     }
-    #endregion
 
 }
 

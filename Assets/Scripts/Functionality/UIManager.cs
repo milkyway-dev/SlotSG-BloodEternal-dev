@@ -64,7 +64,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text specialWinTitle;
     [SerializeField] private GameObject WinPopup_Object;
     [SerializeField] private TMP_Text Win_Text;
-
+    [SerializeField] private Button cancelWinButton;
 
     [Header("low balance popup")]
     [SerializeField] private GameObject LowBalancePopup_Object;
@@ -146,6 +146,7 @@ public class UIManager : MonoBehaviour
         SetButton(QuitSplash_button, () => OpenPopup(QuitPopupObject));
         SetButton(AutoSpinButton, () => OpenPopup(autoSpinPopupObject));
         SetButton(AutoSpinPopUpClose, () => ClosePopup());
+        SetButton(cancelWinButton,()=>CloseWinAnimation());
         // Initialize other settings
         paytableList[CurrentIndex = 0].SetActive(true);
         isMusic = false;
@@ -202,7 +203,7 @@ public class UIManager : MonoBehaviour
     internal void UpdatePlayerInfo(PlayerData playerData)
     {
         playerCurrentWinning.text = playerData.currentWining.ToString();
-        playerBalance.text = playerData.Balance.ToString("f4");
+        playerBalance.text = playerData.Balance.ToString("f3");
 
     }
 
@@ -333,23 +334,7 @@ public class UIManager : MonoBehaviour
 
             CurrentIndex--;
         }
-        // if (CurrentIndex == paytableList.Length - 1)
-        // {
-        //     RightBtn.interactable = false;
-        // }
-        // else
-        // {
-        //     RightBtn.interactable = true;
-
-        // }
-        // if (CurrentIndex == 0)
-        // {
-        //     LeftBtn.interactable = false;
-        // }
-        // else
-        // {
-        //     LeftBtn.interactable = true;
-        // }
+  
 
     }
 
@@ -374,12 +359,6 @@ public class UIManager : MonoBehaviour
 
         switch (value)
         {
-            case 0:
-                {
-                    normalWinImage.gameObject.SetActive(true);
-                    normalWinImage.StartAnimation();
-                    break;
-                }
             case 1:
                 specialWinTitle.text = "BIG WIN";
                 break;
@@ -397,12 +376,12 @@ public class UIManager : MonoBehaviour
 
         DOTween.To(() => initAmount, (val) => initAmount = val, finalAmount, 0.8f).OnUpdate(() =>
         {
-            playerBalance.text = initAmount.ToString("f4");
+            playerBalance.text = initAmount.ToString("f3");
 
         }).OnComplete(() =>
         {
 
-            playerBalance.text = finalAmount.ToString();
+            playerBalance.text = finalAmount.ToString("f3");
         });
     }
 
@@ -437,8 +416,26 @@ public class UIManager : MonoBehaviour
         });
         yield return new WaitForSeconds(0.5f);
         specialWinObject.SetActive(false);
+        CloseWinAnimation();
 
 
+    }
+
+    void CloseWinAnimation(){
+                normalWinImage.StopAnimation();
+            ClosePopup();
+        if (normalWinImage.gameObject.activeSelf)
+        {
+
+            normalWinImage.gameObject.SetActive(false);
+        }
+
+        DOTween.Kill(Win_Text.transform);
+                    Win_Text.transform.localScale = Vector3.one;
+            Win_Text.transform.localPosition = Vector3.zero;
+            Win_Text.text = "0";
+        specialWinObject.SetActive(false);
+        GameManager.winAnimation=false;
     }
     internal void DisconnectionPopup()
     {
