@@ -48509,7 +48509,7 @@ MonoBehaviour:
   Button: {fileID: 8300000, guid: 94ccc83c3f4bb4756a61b9793fd744c5, type: 3}
   Win_Audio: {fileID: 8300000, guid: 5eaf08c44b1ef45cfac9c3357eda41aa, type: 3}
   GambleWin_Audio: {fileID: 8300000, guid: 2389930810622416fa836eb4a2419b3e, type: 3}
-  NormalBg_Audio: {fileID: 8300000, guid: a864018d78413470b94f29fb7a070ffd, type: 3}
+  NormalBg_Audio: {fileID: 8300000, guid: 692c1dc2b329845ffb4847d052200bfb, type: 3}
   FreeSpinBg_Audio: {fileID: 0}
   ReelGlow_audio: {fileID: 8300000, guid: 5898f32c332c84850b5b6b98a362810f, type: 3}
 --- !u!1001 &5078792171338451623
