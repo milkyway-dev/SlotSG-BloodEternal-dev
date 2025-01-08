@@ -9713,7 +9713,7 @@ RectTransform:
   m_Father: {fileID: 305734944}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0.8571429}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -18684,7 +18684,6 @@ MonoBehaviour:
   currentBalance: 0
   currentTotalBet: 0
   betCounter: 0
-  wildPosition: 0
   maxIterationWinShow: 5
   winIterationCount: 0
   freeSpinCount: 0
@@ -23461,7 +23460,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Number of Spins
+  m_text: Spin Options
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 801d6e4f64c8d472c8e01f2c619c29e6, type: 2}
   m_sharedMaterial: {fileID: -1749907445262273213, guid: 801d6e4f64c8d472c8e01f2c619c29e6, type: 2}
@@ -30907,7 +30906,7 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 27
   delayBetweenLoop: 0
-  StartOnAwake: 0
+  StartOnAwake: 1
   DestroyOnCompletion: 0
   isplaying: 0
   OriginalSprite: {fileID: 0}
@@ -39621,7 +39620,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 432860574}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.8571429
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -45784,8 +45783,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 70}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 0, y: 78.41}
+  m_SizeDelta: {x: 232.5, y: 66.81}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2004961740
 MonoBehaviour:
@@ -45807,7 +45806,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Custom
+  m_text: No. of Spins
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 801d6e4f64c8d472c8e01f2c619c29e6, type: 2}
   m_sharedMaterial: {fileID: -1749907445262273213, guid: 801d6e4f64c8d472c8e01f2c619c29e6, type: 2}
@@ -45834,7 +45833,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 46.7
+  m_fontSize: 45.75
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
