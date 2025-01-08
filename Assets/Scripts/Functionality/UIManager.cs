@@ -146,7 +146,7 @@ public class UIManager : MonoBehaviour
         SetButton(QuitSplash_button, () => OpenPopup(QuitPopupObject));
         SetButton(AutoSpinButton, () => OpenPopup(autoSpinPopupObject));
         SetButton(AutoSpinPopUpClose, () => ClosePopup());
-        SetButton(cancelWinButton,()=>CloseWinAnimation());
+        SetButton(cancelWinButton, () => CloseWinAnimation());
         // Initialize other settings
         paytableList[CurrentIndex = 0].SetActive(true);
         isMusic = false;
@@ -286,7 +286,8 @@ public class UIManager : MonoBehaviour
 
     private void OpenPopup(GameObject Popup)
     {
-        if(currentPopup!=null && !DisconnectPopup_Object.activeSelf){
+        if (currentPopup != null && !DisconnectPopup_Object.activeSelf)
+        {
             ClosePopup();
         }
         if (Popup) Popup.SetActive(true);
@@ -299,11 +300,12 @@ public class UIManager : MonoBehaviour
     {
         if (!DisconnectPopup_Object.activeSelf)
         {
-            if(currentPopup!=null){
-            currentPopup.SetActive(false);
-            if (MainPopup_Object) MainPopup_Object.SetActive(false);
+            if (currentPopup != null)
+            {
+                currentPopup.SetActive(false);
+                if (MainPopup_Object) MainPopup_Object.SetActive(false);
 
-            currentPopup = null;
+                currentPopup = null;
             }
 
         }
@@ -334,7 +336,7 @@ public class UIManager : MonoBehaviour
 
             CurrentIndex--;
         }
-  
+
 
     }
 
@@ -387,6 +389,7 @@ public class UIManager : MonoBehaviour
 
     internal IEnumerator WinTextAnim(double amount)
     {
+        normalWinImage.gameObject.SetActive(true);
         double initAmount = 0;
         DOTween.To(() => initAmount, (val) => initAmount = val, amount, 0.8f).OnUpdate(() =>
         {
@@ -396,14 +399,11 @@ public class UIManager : MonoBehaviour
         {
 
             Win_Text.text = amount.ToString("f3");
+            if (normalWinImage.gameObject.activeSelf)
+                normalWinImage.gameObject.SetActive(false);
         });
         yield return new WaitForSeconds(1.8f);
-        normalWinImage.StopAnimation();
-        if (normalWinImage.gameObject.activeSelf)
-        {
 
-            normalWinImage.gameObject.SetActive(false);
-        }
         Win_Text.transform.DOLocalMoveY(-411, 0.35f);
         Win_Text.transform.DOScale(new Vector3(0, 0, 0), 0.4f).OnComplete(() =>
         {
@@ -421,21 +421,18 @@ public class UIManager : MonoBehaviour
 
     }
 
-    void CloseWinAnimation(){
-                normalWinImage.StopAnimation();
-            ClosePopup();
+    void CloseWinAnimation()
+    {
+        ClosePopup();
         if (normalWinImage.gameObject.activeSelf)
-        {
-
             normalWinImage.gameObject.SetActive(false);
-        }
 
         DOTween.Kill(Win_Text.transform);
-                    Win_Text.transform.localScale = Vector3.one;
-            Win_Text.transform.localPosition = Vector3.zero;
-            Win_Text.text = "0";
+        Win_Text.transform.localScale = Vector3.one;
+        Win_Text.transform.localPosition = Vector3.zero;
+        Win_Text.text = "0";
         specialWinObject.SetActive(false);
-        GameManager.winAnimation=false;
+        GameManager.winAnimation = false;
     }
     internal void DisconnectionPopup()
     {
@@ -483,8 +480,8 @@ public class UIManager : MonoBehaviour
         isMute = !isMute;
         if (isMute)
         {
-            isSound=!isSound;
-            isMusic=!isMusic;
+            isSound = !isSound;
+            isMusic = !isMusic;
             ToggleAudio?.Invoke(true, "all");
             Mute_button.transform.GetChild(1).gameObject.SetActive(true);
             Mute_button.transform.GetChild(0).gameObject.SetActive(false);
