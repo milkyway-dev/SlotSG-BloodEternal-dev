@@ -94,8 +94,8 @@ public class GameManager : MonoBehaviour
         SetButton(SlotStart_Button, ExecuteSpin, true);
         SetButton(AutoSpin_Button, () =>
         {
-            ExecuteAutoSpin();
             uIManager.ClosePopup();
+            ExecuteAutoSpin();
         }, true);
         SetButton(AutoSpinStop_Button, () => StartCoroutine(StopAutoSpinCoroutine()));
         // SetButton(BetPlus_Button, () => OnBetChange(true));
@@ -124,7 +124,7 @@ public class GameManager : MonoBehaviour
         {
             eventID = EventTriggerType.Select
         };
-        entry.callback.AddListener((eventData) => {CalculateCost(autoOptions[autoSpinCounter]);  Debug.Log("sdsds");});
+        entry.callback.AddListener((eventData) => { CalculateCost(autoOptions[autoSpinCounter]); Debug.Log("sdsds"); });
         trigger.triggers.Add(entry);
 
 
@@ -186,9 +186,13 @@ public class GameManager : MonoBehaviour
             PayLineCOntroller.paylines = socketController.socketModel.initGameData.lineData;
             uIManager.UpdatePlayerInfo(socketController.socketModel.playerData);
             uIManager.PopulateSymbolsPayout(socketController.socketModel.uIData);
+            if (currentBalance < currentTotalBet && !isFreeSpin)
+            {
+                uIManager.LowBalPopup();
+            }
             PopulateAutoSpinDropDown();
             PopulateBetPerlineDropDown();
-            OnCustomAutoSpin(true,autoOptions[autoSpinCounter]);
+            OnCustomAutoSpin(true, autoOptions[autoSpinCounter]);
             Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
         }
         else
@@ -229,13 +233,14 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void OnCustomAutoSpin(bool inc, int value=0)
+    void OnCustomAutoSpin(bool inc, int value = 0)
     {
-        if(value>0){
-            AutoSpinValue=value;
-                    AUtoSpinCountText.text = AutoSpinValue.ToString();
-        CalculateCost(AutoSpinValue);
-        return;
+        if (value > 0)
+        {
+            AutoSpinValue = value;
+            AUtoSpinCountText.text = AutoSpinValue.ToString();
+            CalculateCost(AutoSpinValue);
+            return;
         }
 
         if (inc)
@@ -498,7 +503,7 @@ public class GameManager : MonoBehaviour
         {
             winAnimation = true;
             CheckWinPopups(socketController.socketModel.playerData.currentWining);
-            gameStateText.text = $"you Won: {socketController.socketModel.playerData.currentWining} ";
+            gameStateText.text = $"you Won: {socketController.socketModel.playerData.currentWining.ToString("f3")} ";
             StartCoroutine(uIManager.WinTextAnim(socketController.socketModel.playerData.currentWining));
             yield return new WaitUntil(() => !winAnimation);
         }
@@ -791,8 +796,8 @@ public class GameManager : MonoBehaviour
         if (betPerLine_text) betPerLine_text.text = socketController.socketModel.initGameData.Bets[betCounter].ToString();
         currentTotalBet = socketController.socketModel.initGameData.Bets[betCounter] * socketController.socketModel.initGameData.lineData.Count;
         if (totalBet_text) totalBet_text.text = currentTotalBet.ToString();
-        if (currentBalance < currentTotalBet)
-            uIManager.LowBalPopup();
+        // if (currentBalance < currentTotalBet)
+        //     uIManager.LowBalPopup();
     }
 
     private void MaxBet()
@@ -805,8 +810,8 @@ public class GameManager : MonoBehaviour
         totalBet_text.text = currentTotalBet.ToString();
         betPerLine_text.text = socketController.socketModel.initGameData.Bets[betCounter].ToString();
 
-        if (currentBalance < currentTotalBet)
-            uIManager.LowBalPopup();
+        // if (currentBalance < currentTotalBet)
+        //     uIManager.LowBalPopup();
     }
 
 
@@ -848,7 +853,7 @@ public class GameManager : MonoBehaviour
 
     private void CalculateCost(int noOfSpins)
     {
-        Debug.Log("no of spins"+noOfSpins);
+        Debug.Log("no of spins" + noOfSpins);
         if (noOfSpins > 0)
             AutoSpinValue = noOfSpins;
 
